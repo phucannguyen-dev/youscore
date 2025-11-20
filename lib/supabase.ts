@@ -97,6 +97,30 @@ export async function getScores(): Promise<Score[]> {
 }
 
 /**
+ * Delete a score from the database
+ * @param id - Score ID to delete
+ * @returns Promise with success boolean
+ */
+export async function deleteScore(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('scores')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting score:', error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Exception deleting score:', err);
+    return false;
+  }
+}
+
+/**
  * Authentication Functions
  */
 

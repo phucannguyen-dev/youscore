@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Download, SlidersHorizontal, Calculator, Calendar, Database, Plus, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Download, SlidersHorizontal, Calculator, Calendar, Database, Plus, Trash2, X, Save } from 'lucide-react';
 import { AppSettings, CustomFactor } from '../types';
 
 interface SettingsProps {
@@ -7,15 +7,23 @@ interface SettingsProps {
   settings: AppSettings;
   onUpdateSettings: (newSettings: AppSettings) => void;
   onExport: () => void;
+  onSaveSettings: () => Promise<void>;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSettings, onExport }) => {
+export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSettings, onExport, onSaveSettings }) => {
   const [newFactorName, setNewFactorName] = useState('');
   const [newFactorMultiplier, setNewFactorMultiplier] = useState(1);
   const [isAddingFactor, setIsAddingFactor] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const handleChange = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     onUpdateSettings({ ...settings, [key]: value });
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    await onSaveSettings();
+    setIsSaving(false);
   };
 
   const handleAddFactor = () => {
@@ -46,15 +54,31 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-20">
-      <div className="flex items-center gap-4 mb-2">
+      <div className="flex items-center justify-between gap-4 mb-2">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onBack}
+            className="p-2 -ml-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+            aria-label="Quay về"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Cài đặt</h2>
+        </div>
+        
+        {/* Save Settings Button */}
         <button 
-          onClick={onBack}
-          className="p-2 -ml-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-          aria-label="Quay về"
+          onClick={handleSave}
+          disabled={isSaving}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm shadow-sm"
         >
-          <ArrowLeft className="w-6 h-6" />
+          {isSaving ? (
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {isSaving ? 'Đang lưu...' : 'Lưu cài đặt'}
         </button>
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Cài đặt</h2>
       </div>
       
       {/* Language Selection */}

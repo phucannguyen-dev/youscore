@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle, Globe } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { Language } from '../types';
 import { useTranslation } from '../lib/translations';
 
@@ -50,35 +50,6 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             {isSignUp ? t.createAccountToSave : t.signInToAccess}
           </p>
-          
-          {/* Language Selector */}
-          <div className="mt-4 flex justify-center">
-            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-              <Globe className="w-4 h-4 text-slate-500 dark:text-slate-400 ml-2" />
-              <button
-                type="button"
-                onClick={() => setLanguage('vi')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  language === 'vi'
-                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                Tiếng Việt
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  language === 'en'
-                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                }`}
-              >
-                English
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Auth Form */}

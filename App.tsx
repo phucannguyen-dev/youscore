@@ -6,7 +6,7 @@ import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
 import { Auth } from './components/Auth';
-import { addScore, getScores, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
+import { addScore, getScores, deleteScore, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
 import { useTranslation } from './lib/translations';
 
 // Default factors requested by user
@@ -173,15 +173,21 @@ function App() {
     localStorage.setItem('scoresnap_data', JSON.stringify(scores));
   }, [scores]);
 
-  // Save settings to localStorage and Supabase
+  // Save settings to localStorage only (manual save to Supabase via button)
   useEffect(() => {
     localStorage.setItem('scoresnap_settings', JSON.stringify(settings));
-    
-    // Save to Supabase if user is logged in
+  }, [settings]);
+
+  // Manual save settings to Supabase
+  const handleSaveSettings = async () => {
     if (user) {
-      saveUserSettings(settings);
+      const success = await saveUserSettings(settings);
+      if (success) {
+        // Show success feedback if needed
+        console.log('Settings saved to cloud');
+      }
     }
-  }, [settings, user]);
+  };
 
   // Load settings from Supabase when user logs in
   useEffect(() => {
@@ -313,7 +319,12 @@ function App() {
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    // Delete from Supabase if user is logged in
+    if (user) {
+      await deleteScore(id);
+    }
+    // Also remove from local state
     setScores(prev => prev.filter(s => s.id !== id));
   };
   
@@ -332,10 +343,18 @@ function App() {
     setSelectedIds(newSelected);
   };
   
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
     
     if (window.confirm(`Bạn có muốn xóa ${selectedIds.size}?`)) {
+      // Delete from Supabase if user is logged in
+      if (user) {
+        // Delete each score from Supabase
+        for (const id of selectedIds) {
+          await deleteScore(id);
+        }
+      }
+      // Remove from local state
       setScores(prev => prev.filter(s => !selectedIds.has(s.id)));
       setIsSelectMode(false);
       setSelectedIds(new Set());
@@ -593,6 +612,7 @@ function App() {
             settings={settings}
             onUpdateSettings={setSettings}
             onExport={handleExport}
+            onSaveSettings={handleSaveSettings}
           />
         )}
 
