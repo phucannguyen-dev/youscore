@@ -5,6 +5,7 @@ import { ScoreEntry, AppSettings, CustomFactor } from './types';
 import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
+import { addScore, getScores, Score } from './lib/supabase';
 
 // Default factors requested by user
 const DEFAULT_FACTORS: CustomFactor[] = [
@@ -23,6 +24,31 @@ const DEFAULT_SETTINGS: AppSettings = {
   semestersPerYear: 2,
   customFactors: DEFAULT_FACTORS
 };
+
+// Helper function to convert Supabase Score to ScoreEntry
+function scoreToScoreEntry(score: Score): ScoreEntry {
+  return {
+    id: score.id,
+    subject: score.subject,
+    examType: score.exam_type,
+    score: score.score,
+    maxScore: score.max_score,
+    timestamp: score.timestamp,
+    originalText: score.original_text || ''
+  };
+}
+
+// Helper function to convert ScoreEntry to Supabase Score format (without id and created_at)
+function scoreEntryToScore(entry: ScoreEntry): Omit<Score, 'id' | 'created_at'> {
+  return {
+    subject: entry.subject,
+    exam_type: entry.examType,
+    score: entry.score,
+    max_score: entry.maxScore,
+    timestamp: entry.timestamp,
+    original_text: entry.originalText
+  };
+}
 
 
 function App() {
@@ -83,16 +109,35 @@ function App() {
     }
   }, [isDarkMode]);
 
-  // Load from local storage on mount
+  // Load from Supabase and local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('scoresnap_data');
-    if (saved) {
+    const loadScores = async () => {
       try {
-        setScores(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load history");
+        // Try to load from Supabase first
+        const supabaseScores = await getScores();
+        if (supabaseScores && supabaseScores.length > 0) {
+          const entries = supabaseScores.map(scoreToScoreEntry);
+          setScores(entries);
+          // Also update localStorage with Supabase data
+          localStorage.setItem('scoresnap_data', JSON.stringify(entries));
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to load from Supabase, falling back to localStorage:', err);
       }
-    }
+
+      // Fallback to localStorage if Supabase fails or is empty
+      const saved = localStorage.getItem('scoresnap_data');
+      if (saved) {
+        try {
+          setScores(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to load history from localStorage");
+        }
+      }
+    };
+
+    loadScores();
   }, []);
 
   // Save to local storage on change
@@ -126,7 +171,20 @@ function App() {
           originalText: input
         };
         
-        setScores(prev => [newEntry, ...prev]);
+        // Save to Supabase
+        const scoreData = scoreEntryToScore(newEntry);
+        const savedScore = await addScore(scoreData);
+        
+        // If Supabase save succeeded, use the returned data (with DB-generated id)
+        // Otherwise, use the local entry
+        if (savedScore) {
+          const entryWithDbId = scoreToScoreEntry(savedScore);
+          setScores(prev => [entryWithDbId, ...prev]);
+        } else {
+          // Fallback: save locally even if Supabase fails
+          setScores(prev => [newEntry, ...prev]);
+        }
+        
         setInput('');
         // Scroll to top of list smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -177,7 +235,21 @@ function App() {
           originalText: "Scanned Image"
         }));
 
-        setScores(prev => [...newEntries, ...prev]);
+        // Save each entry to Supabase
+        const savedEntries: ScoreEntry[] = [];
+        for (const entry of newEntries) {
+          const scoreData = scoreEntryToScore(entry);
+          const savedScore = await addScore(scoreData);
+          
+          if (savedScore) {
+            savedEntries.push(scoreToScoreEntry(savedScore));
+          } else {
+            // Fallback to local entry if Supabase fails
+            savedEntries.push(entry);
+          }
+        }
+
+        setScores(prev => [...savedEntries, ...prev]);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         setError("No scores found in the image. Please try a clearer photo.");
