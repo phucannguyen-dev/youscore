@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera } from 'lucide-react';
+import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut } from 'lucide-react';
 import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
 import { ScoreEntry, AppSettings, CustomFactor } from './types';
 import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
-import { addScore, getScores, Score } from './lib/supabase';
+import { Auth } from './components/Auth';
+import { addScore, getScores, Score, signIn, signUp, signOut, onAuthStateChange, User } from './lib/supabase';
 
 // Default factors requested by user
 const DEFAULT_FACTORS: CustomFactor[] = [
@@ -60,6 +61,11 @@ function App() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Auth state
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  
   // Selection State
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -109,36 +115,60 @@ function App() {
     }
   }, [isDarkMode]);
 
-  // Load from Supabase and local storage on mount
+  // Auth state listener
   useEffect(() => {
-    const loadScores = async () => {
-      try {
-        // Try to load from Supabase first
-        const supabaseScores = await getScores();
-        if (supabaseScores && supabaseScores.length > 0) {
-          const entries = supabaseScores.map(scoreToScoreEntry);
-          setScores(entries);
-          // Also update localStorage with Supabase data
-          localStorage.setItem('scoresnap_data', JSON.stringify(entries));
-          return;
-        }
-      } catch (err) {
-        console.error('Failed to load from Supabase, falling back to localStorage:', err);
+    const unsubscribe = onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+      
+      // Reload scores when user signs in
+      if (event === 'SIGNED_IN' && session?.user) {
+        loadScores();
       }
-
-      // Fallback to localStorage if Supabase fails or is empty
-      const saved = localStorage.getItem('scoresnap_data');
-      if (saved) {
-        try {
-          setScores(JSON.parse(saved));
-        } catch (e) {
-          console.error("Failed to load history from localStorage");
-        }
+      // Clear scores when user signs out
+      if (event === 'SIGNED_OUT') {
+        setScores([]);
+        localStorage.removeItem('scoresnap_data');
       }
-    };
+    });
 
-    loadScores();
+    return () => unsubscribe();
   }, []);
+
+  // Load from Supabase and local storage on mount
+  const loadScores = async () => {
+    if (!user) return;
+    
+    try {
+      // Try to load from Supabase first
+      const supabaseScores = await getScores();
+      if (supabaseScores && supabaseScores.length > 0) {
+        const entries = supabaseScores.map(scoreToScoreEntry);
+        setScores(entries);
+        // Also update localStorage with Supabase data
+        localStorage.setItem('scoresnap_data', JSON.stringify(entries));
+        return;
+      }
+    } catch (err) {
+      console.error('Failed to load from Supabase, falling back to localStorage:', err);
+    }
+
+    // Fallback to localStorage if Supabase fails or is empty
+    const saved = localStorage.getItem('scoresnap_data');
+    if (saved) {
+      try {
+        setScores(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load history from localStorage");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadScores();
+    }
+  }, [user]);
 
   // Save to local storage on change
   useEffect(() => {
@@ -299,6 +329,46 @@ function App() {
     setScores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   };
 
+  // Auth handlers
+  const handleSignIn = async (email: string, password: string) => {
+    setAuthError(null);
+    setAuthLoading(true);
+    
+    const { session, error } = await signIn(email, password);
+    
+    if (error) {
+      setAuthError('Email hoặc mật khẩu không đúng');
+    } else if (session) {
+      setUser(session.user);
+    }
+    
+    setAuthLoading(false);
+  };
+
+  const handleSignUp = async (email: string, password: string) => {
+    setAuthError(null);
+    setAuthLoading(true);
+    
+    const { user: newUser, error } = await signUp(email, password);
+    
+    if (error) {
+      setAuthError('Không thể tạo tài khoản. Vui lòng thử lại.');
+    } else if (newUser) {
+      setAuthError(null);
+      // Show success message
+      setAuthError('Kiểm tra email của bạn để xác nhận tài khoản');
+    }
+    
+    setAuthLoading(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setUser(null);
+    setScores([]);
+    localStorage.removeItem('scoresnap_data');
+  };
+
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   const handleExport = () => {
@@ -334,6 +404,26 @@ function App() {
   // Derived available factors list
   const availableFactors = useMemo(() => settings.customFactors.map(f => f.name), [settings.customFactors]);
 
+  // Show auth screen if user is not logged in
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-800 border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Auth
+        onSignIn={handleSignIn}
+        onSignUp={handleSignUp}
+        error={authError}
+        isLoading={authLoading}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 md:pb-32 relative font-sans text-slate-900 dark:text-slate-100 selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 transition-colors duration-300">
       
@@ -367,6 +457,14 @@ function App() {
                 aria-label="Giao diện"
             >
                 {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button 
+                onClick={handleSignOut}
+                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                aria-label="Đăng xuất"
+                title="Đăng xuất"
+            >
+                <LogOut className="w-5 h-5" />
             </button>
           </div>
         </div>
