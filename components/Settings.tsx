@@ -57,6 +57,28 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
         <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Cài đặt</h2>
       </div>
       
+      {/* Language Selection */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4" /> Ngôn ngữ / Language
+        </h3>
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-6">
+            <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Chọn ngôn ngữ / Select Language
+                </label>
+                <select 
+                    value={settings.language}
+                    onChange={(e) => handleChange('language', e.target.value as 'vi' | 'en')}
+                    className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                >
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+      </section>
+      
       {/* Display & Sort */}
       <section className="space-y-4">
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">

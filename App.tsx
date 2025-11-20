@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut } from 'lucide-react';
 import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
-import { ScoreEntry, AppSettings, CustomFactor } from './types';
+import { ScoreEntry, AppSettings, CustomFactor, Language } from './types';
 import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
 import { Auth } from './components/Auth';
-import { addScore, getScores, Score, signIn, signUp, signOut, onAuthStateChange, User } from './lib/supabase';
+import { addScore, getScores, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
+import { useTranslation } from './lib/translations';
 
 // Default factors requested by user
 const DEFAULT_FACTORS: CustomFactor[] = [
@@ -23,7 +24,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   showDates: true,
   defaultMaxScore: 10, // Changed from 100 to 10
   semestersPerYear: 2,
-  customFactors: DEFAULT_FACTORS
+  customFactors: DEFAULT_FACTORS,
+  language: 'vi' as Language
 };
 
 // Helper function to convert Supabase Score to ScoreEntry
@@ -171,10 +173,29 @@ function App() {
     localStorage.setItem('scoresnap_data', JSON.stringify(scores));
   }, [scores]);
 
-  // Save settings
+  // Save settings to localStorage and Supabase
   useEffect(() => {
     localStorage.setItem('scoresnap_settings', JSON.stringify(settings));
-  }, [settings]);
+    
+    // Save to Supabase if user is logged in
+    if (user) {
+      saveUserSettings(settings);
+    }
+  }, [settings, user]);
+
+  // Load settings from Supabase when user logs in
+  useEffect(() => {
+    const loadUserSettings = async () => {
+      if (!user) return;
+      
+      const userSettings = await getUserSettings();
+      if (userSettings) {
+        setSettings(userSettings);
+      }
+    };
+    
+    loadUserSettings();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -326,31 +347,38 @@ function App() {
   };
 
   // Auth handlers
-  const handleSignIn = async (email: string, password: string) => {
+  const handleSignIn = async (email: string, password: string, language: Language) => {
     setAuthMessage(null);
     setAuthLoading(true);
     
     const { session, error } = await signIn(email, password);
     
     if (error) {
-      setAuthMessage({ text: 'Email hoặc mật khẩu không đúng', type: 'error' });
+      const t = useTranslation(language);
+      setAuthMessage({ text: t.invalidCredentials, type: 'error' });
     } else if (session) {
       setUser(session.user);
+      // Update language preference
+      await upsertUserProfile({ language });
     }
     
     setAuthLoading(false);
   };
 
-  const handleSignUp = async (email: string, password: string) => {
+  const handleSignUp = async (email: string, password: string, language: Language) => {
     setAuthMessage(null);
     setAuthLoading(true);
     
     const { user: newUser, error } = await signUp(email, password);
     
     if (error) {
-      setAuthMessage({ text: 'Không thể tạo tài khoản. Vui lòng thử lại.', type: 'error' });
+      const t = useTranslation(language);
+      setAuthMessage({ text: t.accountCreationFailed, type: 'error' });
     } else if (newUser) {
-      setAuthMessage({ text: 'Kiểm tra email của bạn để xác nhận tài khoản', type: 'success' });
+      // Create user profile with selected language
+      await upsertUserProfile({ language });
+      const t = useTranslation(language);
+      setAuthMessage({ text: t.checkEmail, type: 'success' });
     }
     
     setAuthLoading(false);

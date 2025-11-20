@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
-import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle, Globe } from 'lucide-react';
+import { Language } from '../types';
+import { useTranslation } from '../lib/translations';
 
 interface AuthProps {
-  onSignIn: (email: string, password: string) => Promise<void>;
-  onSignUp: (email: string, password: string) => Promise<void>;
+  onSignIn: (email: string, password: string, language: Language) => Promise<void>;
+  onSignUp: (email: string, password: string, language: Language) => Promise<void>;
   message: { text: string; type: 'error' | 'success' } | null;
   isLoading: boolean;
+  initialLanguage?: Language;
 }
 
-export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
+export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage = 'vi' }: AuthProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [language, setLanguage] = useState<Language>(initialLanguage);
   const [localMessage, setLocalMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
+
+  const t = useTranslation(language);
 
   // Use parent message or local message
   const displayMessage = message || localMessage;
@@ -22,9 +28,9 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
     if (!email.trim() || !password.trim()) return;
 
     if (isSignUp) {
-      await onSignUp(email, password);
+      await onSignUp(email, password, language);
     } else {
-      await onSignIn(email, password);
+      await onSignIn(email, password, language);
     }
   };
 
@@ -39,13 +45,40 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
             </div>
           </div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
-            {isSignUp ? 'Tạo tài khoản' : 'Đăng nhập'}
+            {isSignUp ? t.signUp : t.signIn}
           </h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            {isSignUp
-              ? 'Tạo tài khoản để lưu điểm của bạn'
-              : 'Đăng nhập để truy cập điểm của bạn'}
+            {isSignUp ? t.createAccountToSave : t.signInToAccess}
           </p>
+          
+          {/* Language Selector */}
+          <div className="mt-4 flex justify-center">
+            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+              <Globe className="w-4 h-4 text-slate-500 dark:text-slate-400 ml-2" />
+              <button
+                type="button"
+                onClick={() => setLanguage('vi')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  language === 'vi'
+                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                Tiếng Việt
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  language === 'en'
+                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                English
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Auth Form */}
@@ -69,7 +102,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Email
+                {t.email}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -89,7 +122,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
             {/* Password Input */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Mật khẩu
+                {t.password}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -107,7 +140,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
               </div>
               {isSignUp && (
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Mật khẩu phải có ít nhất 6 ký tự
+                  {t.passwordMinLength}
                 </p>
               )}
             </div>
@@ -123,7 +156,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
               ) : (
                 <>
                   {isSignUp ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
-                  {isSignUp ? 'Tạo tài khoản' : 'Đăng nhập'}
+                  {isSignUp ? t.signUp : t.signIn}
                 </>
               )}
             </button>
@@ -142,16 +175,14 @@ export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
               disabled={isLoading}
             >
-              {isSignUp
-                ? 'Đã có tài khoản? Đăng nhập'
-                : 'Chưa có tài khoản? Tạo tài khoản'}
+              {isSignUp ? t.alreadyHaveAccount : t.dontHaveAccount}
             </button>
           </div>
         </div>
 
         {/* Footer Note */}
         <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-          Dữ liệu của bạn được bảo mật và lưu trữ an toàn
+          {t.dataSecure}
         </p>
       </div>
     </div>

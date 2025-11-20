@@ -1,4 +1,5 @@
 import { createClient, User, Session } from '@supabase/supabase-js';
+import { Language, UserProfile, AppSettings } from '../types';
 
 // Database schema type for the scores table
 export interface Score {
@@ -11,6 +12,15 @@ export interface Score {
   original_text: string | null;
   timestamp: number;
   user_id: string;
+}
+
+// Database schema for user_settings table
+export interface UserSettings {
+  id: string;
+  user_id: string;
+  settings: AppSettings;
+  created_at: string;
+  updated_at: string;
 }
 
 // Initialize Supabase client
@@ -208,4 +218,144 @@ export async function getCurrentUser() {
 export function onAuthStateChange(callback: (event: string, session: Session | null) => void) {
   const { data: { subscription } } = supabase.auth.onAuthStateChange(callback);
   return () => subscription.unsubscribe();
+}
+
+/**
+ * User Profile Functions
+ */
+
+/**
+ * Get user profile
+ * @returns Promise with user profile or null
+ */
+export async function getUserProfile(): Promise<UserProfile | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Exception fetching user profile:', err);
+    return null;
+  }
+}
+
+/**
+ * Create or update user profile
+ * @param profile - Profile data
+ * @returns Promise with updated profile or null
+ */
+export async function upsertUserProfile(profile: Partial<Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>>): Promise<UserProfile | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .upsert({
+        user_id: user.id,
+        ...profile,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error upserting user profile:', error);
+      return null;
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Exception upserting user profile:', err);
+    return null;
+  }
+}
+
+/**
+ * User Settings Functions
+ */
+
+/**
+ * Get user settings from database
+ * @returns Promise with user settings or null
+ */
+export async function getUserSettings(): Promise<AppSettings | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('user_settings')
+      .select('settings')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user settings:', error);
+      return null;
+    }
+
+    return data?.settings || null;
+  } catch (err) {
+    console.error('Exception fetching user settings:', err);
+    return null;
+  }
+}
+
+/**
+ * Save user settings to database
+ * @param settings - App settings to save
+ * @returns Promise with success boolean
+ */
+export async function saveUserSettings(settings: AppSettings): Promise<boolean> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return false;
+    }
+
+    const { error } = await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: user.id,
+        settings,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
+
+    if (error) {
+      console.error('Error saving user settings:', error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Exception saving user settings:', err);
+    return false;
+  }
 }

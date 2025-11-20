@@ -7,6 +7,8 @@ export enum ExamType {
   OTHER = 'Other'
 }
 
+export type Language = 'vi' | 'en';
+
 export interface ScoreEntry {
   id: string;
   subject: string;
@@ -37,4 +39,15 @@ export interface AppSettings {
   defaultMaxScore: number;
   semestersPerYear: number;
   customFactors: CustomFactor[];
+  language: Language;
+}
+
+export interface UserProfile {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  language: Language;
+  created_at: string;
+  updated_at: string;
 }

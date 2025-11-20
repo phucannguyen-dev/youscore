@@ -22,7 +22,7 @@ npm install
 
 1. Create a Supabase project at [supabase.com](https://supabase.com)
 
-2. Run this SQL in your Supabase SQL Editor to create the scores table:
+2. Run this SQL in your Supabase SQL Editor to create the required tables:
 
 ```sql
 -- Create scores table
@@ -38,27 +38,72 @@ create table scores (
   user_id uuid references auth.users(id) on delete cascade
 );
 
+-- Create user_profiles table
+create table user_profiles (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade unique not null,
+  full_name text,
+  avatar_url text,
+  language text default 'vi' not null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Create user_settings table
+create table user_settings (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade unique not null,
+  settings jsonb not null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 -- Enable Row Level Security
 alter table scores enable row level security;
+alter table user_profiles enable row level security;
+alter table user_settings enable row level security;
 
--- Create policy to allow users to view only their own scores
+-- Policies for scores table
 create policy "Users can view own scores"
   on scores for select
   using (auth.uid() = user_id);
 
--- Create policy to allow users to insert their own scores
 create policy "Users can insert own scores"
   on scores for insert
   with check (auth.uid() = user_id);
 
--- Create policy to allow users to update their own scores
 create policy "Users can update own scores"
   on scores for update
   using (auth.uid() = user_id);
 
--- Create policy to allow users to delete their own scores
 create policy "Users can delete own scores"
   on scores for delete
+  using (auth.uid() = user_id);
+
+-- Policies for user_profiles table
+create policy "Users can view own profile"
+  on user_profiles for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own profile"
+  on user_profiles for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own profile"
+  on user_profiles for update
+  using (auth.uid() = user_id);
+
+-- Policies for user_settings table
+create policy "Users can view own settings"
+  on user_settings for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own settings"
+  on user_settings for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own settings"
+  on user_settings for update
   using (auth.uid() = user_id);
 ```
 
