@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera } from 'lucide-react';
+import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
 import { ScoreEntry, AppSettings, CustomFactor } from './types';
 import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
+import { AuthModal } from './components/AuthModal';
+import { useAuth } from './contexts/AuthContext';
+import { getUserScores, saveUserScores, getUserSettings, saveUserSettings } from './services/supabaseService';
 
 // Default factors requested by user
 const DEFAULT_FACTORS: CustomFactor[] = [
@@ -26,11 +29,13 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 
 function App() {
+  const { user, loading: authLoading, signIn, signUp, signOut } = useAuth();
   const [input, setInput] = useState('');
   const [scores, setScores] = useState<ScoreEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'home' | 'settings'>('home');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -95,15 +100,50 @@ function App() {
     }
   }, []);
 
+  // Load user data from Supabase when user logs in
+  useEffect(() => {
+    if (user && !authLoading) {
+      getUserScores(user.id).then((userScores) => {
+        if (userScores && userScores.length > 0) {
+          setScores(userScores);
+        }
+      }).catch(err => {
+        console.error("Failed to load user scores from Supabase:", err);
+      });
+
+      getUserSettings(user.id).then((userSettings) => {
+        if (userSettings) {
+          setSettings(userSettings);
+        }
+      }).catch(err => {
+        console.error("Failed to load user settings from Supabase:", err);
+      });
+    }
+  }, [user, authLoading]);
+
   // Save to local storage on change
   useEffect(() => {
     localStorage.setItem('scoresnap_data', JSON.stringify(scores));
-  }, [scores]);
+    
+    // Sync with Supabase if user is logged in
+    if (user && scores.length > 0) {
+      saveUserScores(user.id, scores).catch(err => {
+        console.error("Failed to sync scores with Supabase:", err);
+      });
+    }
+  }, [scores, user]);
 
   // Save settings
   useEffect(() => {
     localStorage.setItem('scoresnap_settings', JSON.stringify(settings));
-  }, [settings]);
+    
+    // Sync with Supabase if user is logged in
+    if (user) {
+      saveUserSettings(user.id, settings).catch(err => {
+        console.error("Failed to sync settings with Supabase:", err);
+      });
+    }
+  }, [settings, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,6 +322,28 @@ function App() {
             <div className="text-xs font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md mr-1 hidden sm:block">
                 Beta
             </div>
+            {user ? (
+              <button
+                onClick={async () => {
+                  if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
+                    await signOut();
+                  }
+                }}
+                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                aria-label="Đăng xuất"
+                title={`Đã đăng nhập: ${user.email}`}
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                aria-label="Đăng nhập"
+              >
+                <LogIn className="w-5 h-5" />
+              </button>
+            )}
             <button 
                 onClick={() => setCurrentView(currentView === 'settings' ? 'home' : 'settings')}
                 className={`p-2 rounded-full transition-colors ${currentView === 'settings' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
@@ -481,6 +543,14 @@ function App() {
            </div>
         </div>
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSignIn={signIn}
+        onSignUp={signUp}
+      />
 
     </div>
   );
