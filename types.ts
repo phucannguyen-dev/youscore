@@ -40,6 +40,7 @@ export interface AppSettings {
   semestersPerYear: number;
   customFactors: CustomFactor[];
   language: Language;
+  customSubjects: string[];
 }
 
 export interface UserProfile {

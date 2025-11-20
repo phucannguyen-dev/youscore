@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ScoreEntry, CustomFactor } from '../types';
-import { TrendingUp, Award, BookOpen } from 'lucide-react';
+import { TrendingUp, Award, BookOpen, Calendar } from 'lucide-react';
 
 interface DashboardProps {
   scores: ScoreEntry[];
@@ -8,13 +8,47 @@ interface DashboardProps {
   rounding: number;
   customFactors: CustomFactor[];
   defaultMaxScore: number;
+  semestersPerYear: number;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, rounding, customFactors, defaultMaxScore }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, rounding, customFactors, defaultMaxScore, semestersPerYear }) => {
+  const [selectedSemester, setSelectedSemester] = useState<'all' | number>('all');
+  
+  // Calculate semester for each score based on timestamp
+  const scoresWithSemester = useMemo(() => {
+    return scores.map(score => {
+      const date = new Date(score.timestamp);
+      const month = date.getMonth() + 1; // 1-12
+      
+      // Determine semester based on month and semestersPerYear
+      let semester = 1;
+      if (semestersPerYear === 2) {
+        semester = month <= 6 ? 1 : 2;
+      } else if (semestersPerYear === 3) {
+        if (month <= 4) semester = 1;
+        else if (month <= 8) semester = 2;
+        else semester = 3;
+      } else if (semestersPerYear === 4) {
+        if (month <= 3) semester = 1;
+        else if (month <= 6) semester = 2;
+        else if (month <= 9) semester = 3;
+        else semester = 4;
+      }
+      
+      return { ...score, semester };
+    });
+  }, [scores, semestersPerYear]);
+
+  // Filter scores by selected semester
+  const filteredScores = useMemo(() => {
+    if (selectedSemester === 'all') return scoresWithSemester;
+    return scoresWithSemester.filter(s => s.semester === selectedSemester);
+  }, [scoresWithSemester, selectedSemester]);
+
   const stats = useMemo(() => {
-    if (scores.length === 0) return { average: 0, total: 0, bestSubject: 'N/A', subjectData: [] };
+    if (filteredScores.length === 0) return { average: 0, total: 0, bestSubject: 'N/A', subjectData: [] };
     
-    const total = scores.length;
+    const total = filteredScores.length;
     
     // Weighted Average Calculation Variables
     let totalWeightedScore = 0;
@@ -28,7 +62,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
     // Structure to hold per-subject aggregation
     const subjectMap = new Map<string, { weightedScore: number; weightedMax: number; entries: ScoreEntry[] }>();
 
-    scores.forEach(s => {
+    filteredScores.forEach(s => {
         // Find multiplier for this exam type, default to 1 if not found
         const multiplier = factorMap.get(s.examType) || 1;
         
@@ -75,12 +109,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
     });
 
     return { average, total, bestSubject, subjectData };
-  }, [scores, customFactors, defaultMaxScore]);
+  }, [filteredScores, customFactors, defaultMaxScore]);
 
   if (scores.length === 0) return null;
 
+  // Generate semester options
+  const semesterOptions = ['all', ...Array.from({ length: semestersPerYear }, (_, i) => i + 1)];
+
   return (
     <div className="mb-8 space-y-6">
+      {/* Semester Selector */}
+      <div className="flex items-center gap-3 justify-between">
+        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <TrendingUp className="w-4 h-4" /> Thống kê
+        </h3>
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <select 
+            value={selectedSemester}
+            onChange={(e) => setSelectedSemester(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
+            className="text-sm p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+          >
+            <option value="all">Tất cả</option>
+            {Array.from({ length: semestersPerYear }, (_, i) => (
+              <option key={i + 1} value={i + 1}>Học kỳ {i + 1}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-indigo-500 dark:bg-indigo-600 text-white p-4 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">

@@ -18,6 +18,26 @@ const DEFAULT_FACTORS: CustomFactor[] = [
     { id: '5', name: 'Khác', multiplier: 1 },
 ];
 
+// Default subject list in Vietnamese
+const DEFAULT_SUBJECTS: string[] = [
+  'Toán',
+  'Ngữ văn',
+  'Tiếng Anh',
+  'Vật lý',
+  'Hóa học',
+  'Sinh học',
+  'Lịch sử',
+  'Địa lý',
+  'Giáo dục công dân',
+  'Công nghệ',
+  'Tin học',
+  'Thể dục',
+  'Âm nhạc',
+  'Mỹ thuật',
+  'Giáo dục quốc phòng và an ninh',
+  'Giáo dục kinh tế và pháp luật',
+];
+
 const DEFAULT_SETTINGS: AppSettings = {
   sortOption: 'date_desc',
   rounding: 1,
@@ -25,7 +45,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   defaultMaxScore: 10, // Changed from 100 to 10
   semestersPerYear: 2,
   customFactors: DEFAULT_FACTORS,
-  language: 'vi' as Language
+  language: 'vi' as Language,
+  customSubjects: DEFAULT_SUBJECTS
 };
 
 // Helper function to convert Supabase Score to ScoreEntry
@@ -83,6 +104,10 @@ function App() {
                 // Ensure customFactors exists if loading old settings
                 if (!parsed.customFactors) {
                     parsed.customFactors = DEFAULT_FACTORS;
+                }
+                // Ensure customSubjects exists if loading old settings
+                if (!parsed.customSubjects) {
+                    parsed.customSubjects = DEFAULT_SUBJECTS;
                 }
                 // Ensure defaultMaxScore is updated if it was the old default (100) and user hasn't changed it, 
                 // but actually let's just respect the saved value unless it's missing.
@@ -214,7 +239,7 @@ function App() {
       // Extract factor names for the AI prompt
       const availableFactors = settings.customFactors.map(f => f.name);
       
-      const result = await parseScoreFromText(input, settings.defaultMaxScore, availableFactors);
+      const result = await parseScoreFromText(input, settings.defaultMaxScore, availableFactors, settings.customSubjects);
       
       if (result) {
         const newEntry: ScoreEntry = {
@@ -278,7 +303,7 @@ function App() {
       });
 
       const availableFactors = settings.customFactors.map(f => f.name);
-      const results = await parseScoresFromImage(base64Data, file.type, settings.defaultMaxScore, availableFactors);
+      const results = await parseScoresFromImage(base64Data, file.type, settings.defaultMaxScore, availableFactors, settings.customSubjects);
 
       if (results && results.length > 0) {
         const newEntries: ScoreEntry[] = results.map(r => ({
@@ -542,6 +567,7 @@ function App() {
                 rounding={settings.rounding} 
                 customFactors={settings.customFactors}
                 defaultMaxScore={settings.defaultMaxScore}
+                semestersPerYear={settings.semestersPerYear}
             />
 
             {/* Recent List Header */}

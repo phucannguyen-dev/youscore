@@ -3,16 +3,29 @@ import { ScoreEntry } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-export const parseScoreFromText = async (text: string, defaultMaxScore: number, availableExamTypes: string[]): Promise<Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'> | null> => {
+export const parseScoreFromText = async (
+  text: string, 
+  defaultMaxScore: number, 
+  availableExamTypes: string[],
+  customSubjects: string[] = []
+): Promise<Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'> | null> => {
   try {
     // Ensure we have at least 'Other' if the list is somehow empty
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
+
+    // Build subject instruction
+    let subjectInstruction = 'Tự động chuẩn hóa tên môn học';
+    if (customSubjects.length > 0) {
+      subjectInstruction = `Tên môn học phải khớp CHÍNH XÁC với một trong các môn sau: ${customSubjects.join(', ')}.
+      Chuẩn hóa từ viết tắt hoặc tên không chính thức (ví dụ: "lý" -> "Vật lý", "anh" -> "Tiếng Anh", "văn" -> "Ngữ văn", "toán" -> "Toán").
+      Nếu không chắc chắn, chọn môn gần nhất trong danh sách.`;
+    }
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Trích xuất thông tin điểm học tập từ văn bản này: "${text}".
       Nếu không có thông tin điểm số, suy đoán ${defaultMaxScore} trừ khi ngữ cảnh rõ ràng chỉ ra khác.
-      Tự động chuẩn hóa tên môn học (ví dụ, "lý" -> "Vật lý", "anh" -> "Anh Văn").
+      ${subjectInstruction}
       
       Phân loại loại bài kiểm tra vào đúng một trong các loại sau: ${examTypes.join(', ')}.
       Chọn loại phù hợp nhất với ngữ cảnh. Nếu không chắc chắn, sử dụng "Khác".
@@ -60,10 +73,17 @@ export const parseScoresFromImage = async (
   base64Data: string,
   mimeType: string,
   defaultMaxScore: number,
-  availableExamTypes: string[]
+  availableExamTypes: string[],
+  customSubjects: string[] = []
 ): Promise<Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'>[]> => {
   try {
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
+
+    // Build subject instruction
+    let subjectInstruction = 'chuẩn hóa tên môn học (ví dụ, "lý" -> "Vật lý")';
+    if (customSubjects.length > 0) {
+      subjectInstruction = `tên môn học phải khớp CHÍNH XÁC với một trong: ${customSubjects.join(', ')}. Chuẩn hóa từ viết tắt (ví dụ: "lý" -> "Vật lý", "anh" -> "Tiếng Anh")`;
+    }
 
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
@@ -78,7 +98,7 @@ export const parseScoresFromImage = async (
           {
             text: `Phân tích ảnh này chứa thông tin điểm số. Trích xuất tất cả các thông tin điểm số khác biệt.
             Đối với mỗi thông tin:
-            1. Xác định tên môn học (chuẩn hóa nó, ví dụ, "lý" -> "Vật lý").
+            1. Xác định tên môn học (${subjectInstruction}).
             2. Xác định điểm số và điểm số tối đa. Nếu điểm số tối đa không rõ ràng, suy đoán ${defaultMaxScore} hoặc dựa trên ngữ cảnh (ví dụ, 10/10, 100/100).
             3. Phân loại loại bài kiểm tra vào đúng một trong các loại sau: ${examTypes.join(', ')}. Sử dụng "Khác" nếu không chắc chắn.
             `
