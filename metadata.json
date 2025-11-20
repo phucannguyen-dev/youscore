@@ -1,0 +1,5 @@
+{
+  "name": "YouScore",
+  "description": "A smart academic tracking application that lets you input scores using natural language processing powered by Gemini.",
+  "requestFramePermissions": []
+}
