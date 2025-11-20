@@ -58,18 +58,20 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
     if (!newSubjectName.trim()) return;
     
     // Check if subject already exists
-    if (settings.customSubjects.includes(newSubjectName.trim())) {
+    const currentSubjects = settings.customSubjects || [];
+    if (currentSubjects.includes(newSubjectName.trim())) {
       alert('Môn học đã tồn tại!');
       return;
     }
     
-    handleChange('customSubjects', [...settings.customSubjects, newSubjectName.trim()]);
+    handleChange('customSubjects', [...currentSubjects, newSubjectName.trim()]);
     setNewSubjectName('');
     setIsAddingSubject(false);
   };
 
   const handleDeleteSubject = (subject: string) => {
-    handleChange('customSubjects', settings.customSubjects.filter(s => s !== subject));
+    const currentSubjects = settings.customSubjects || [];
+    handleChange('customSubjects', currentSubjects.filter(s => s !== subject));
   };
 
   return (
@@ -303,7 +305,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
             
             {/* Subject List */}
             <div className="space-y-2">
-                {settings.customSubjects.map((subject) => (
+                {(settings.customSubjects || []).map((subject) => (
                     <div key={subject} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                         <span className="flex-1 text-sm font-medium text-slate-800 dark:text-slate-200">{subject}</span>
                         <button
