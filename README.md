@@ -35,7 +35,7 @@ You can use `.env.example` as a template.
 
 1. Create a new project on [Supabase](https://supabase.com)
 2. Go to Project Settings > API to get your project URL and anon key
-3. Run the following SQL in the SQL Editor to create necessary tables:
+3. Run the SQL script from `supabase-schema.sql` in the SQL Editor to create necessary tables, or copy and paste the following SQL:
 
 ```sql
 -- Create user_scores table
