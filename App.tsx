@@ -8,6 +8,7 @@ import { Settings } from './components/Settings';
 import { Auth } from './components/Auth';
 import { addScore, getScores, deleteScore, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
 import { useTranslation } from './lib/translations';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Default factors requested by user
 const DEFAULT_FACTORS: CustomFactor[] = [
