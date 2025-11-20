@@ -10,7 +10,7 @@ export interface Score {
   exam_type: string;
   original_text: string | null;
   timestamp: number;
-  user_id?: string;
+  user_id: string;
 }
 
 // Initialize Supabase client
@@ -24,10 +24,10 @@ export type { User, Session };
 
 /**
  * Add a new score to the database
- * @param score - Score data without id and created_at (auto-generated)
+ * @param score - Score data without id, created_at, and user_id (auto-generated)
  * @returns Promise with the inserted score or error
  */
-export async function addScore(score: Omit<Score, 'id' | 'created_at'>): Promise<Score | null> {
+export async function addScore(score: Omit<Score, 'id' | 'created_at' | 'user_id'>): Promise<Score | null> {
   try {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();

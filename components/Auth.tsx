@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { LogIn, UserPlus, Mail, Lock, AlertCircle } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface AuthProps {
   onSignIn: (email: string, password: string) => Promise<void>;
   onSignUp: (email: string, password: string) => Promise<void>;
-  error: string | null;
+  message: { text: string; type: 'error' | 'success' } | null;
   isLoading: boolean;
 }
 
-export function Auth({ onSignIn, onSignUp, error, isLoading }: AuthProps) {
+export function Auth({ onSignIn, onSignUp, message, isLoading }: AuthProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [localMessage, setLocalMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
+
+  // Use parent message or local message
+  const displayMessage = message || localMessage;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,10 +50,18 @@ export function Auth({ onSignIn, onSignUp, error, isLoading }: AuthProps) {
 
         {/* Auth Form */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-800">
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error}</span>
+          {displayMessage && (
+            <div className={`mb-4 p-3 rounded-lg flex items-center gap-2 text-sm ${
+              displayMessage.type === 'error' 
+                ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
+                : 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400'
+            }`}>
+              {displayMessage.type === 'error' ? (
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              ) : (
+                <CheckCircle className="w-4 h-4 flex-shrink-0" />
+              )}
+              <span>{displayMessage.text}</span>
             </div>
           )}
 
@@ -125,6 +137,7 @@ export function Auth({ onSignIn, onSignUp, error, isLoading }: AuthProps) {
                 setIsSignUp(!isSignUp);
                 setEmail('');
                 setPassword('');
+                setLocalMessage(null);
               }}
               className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
               disabled={isLoading}

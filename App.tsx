@@ -39,8 +39,8 @@ function scoreToScoreEntry(score: Score): ScoreEntry {
   };
 }
 
-// Helper function to convert ScoreEntry to Supabase Score format (without id and created_at)
-function scoreEntryToScore(entry: ScoreEntry): Omit<Score, 'id' | 'created_at'> {
+// Helper function to convert ScoreEntry to Supabase Score format (without id, created_at, and user_id)
+function scoreEntryToScore(entry: ScoreEntry): Omit<Score, 'id' | 'created_at' | 'user_id'> {
   return {
     subject: entry.subject,
     exam_type: entry.examType,
@@ -64,7 +64,7 @@ function App() {
   // Auth state
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [authMessage, setAuthMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
   
   // Selection State
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -115,16 +115,47 @@ function App() {
     }
   }, [isDarkMode]);
 
+  // Load from Supabase and local storage
+  useEffect(() => {
+    const loadScores = async () => {
+      if (!user) return;
+      
+      try {
+        // Try to load from Supabase first
+        const supabaseScores = await getScores();
+        if (supabaseScores && supabaseScores.length > 0) {
+          const entries = supabaseScores.map(scoreToScoreEntry);
+          setScores(entries);
+          // Also update localStorage with Supabase data
+          localStorage.setItem('scoresnap_data', JSON.stringify(entries));
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to load from Supabase, falling back to localStorage:', err);
+      }
+
+      // Fallback to localStorage if Supabase fails or is empty
+      const saved = localStorage.getItem('scoresnap_data');
+      if (saved) {
+        try {
+          setScores(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to load history from localStorage");
+        }
+      }
+    };
+
+    if (user) {
+      loadScores();
+    }
+  }, [user]);
+
   // Auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       setAuthLoading(false);
       
-      // Reload scores when user signs in
-      if (event === 'SIGNED_IN' && session?.user) {
-        loadScores();
-      }
       // Clear scores when user signs out
       if (event === 'SIGNED_OUT') {
         setScores([]);
@@ -134,41 +165,6 @@ function App() {
 
     return () => unsubscribe();
   }, []);
-
-  // Load from Supabase and local storage on mount
-  const loadScores = async () => {
-    if (!user) return;
-    
-    try {
-      // Try to load from Supabase first
-      const supabaseScores = await getScores();
-      if (supabaseScores && supabaseScores.length > 0) {
-        const entries = supabaseScores.map(scoreToScoreEntry);
-        setScores(entries);
-        // Also update localStorage with Supabase data
-        localStorage.setItem('scoresnap_data', JSON.stringify(entries));
-        return;
-      }
-    } catch (err) {
-      console.error('Failed to load from Supabase, falling back to localStorage:', err);
-    }
-
-    // Fallback to localStorage if Supabase fails or is empty
-    const saved = localStorage.getItem('scoresnap_data');
-    if (saved) {
-      try {
-        setScores(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load history from localStorage");
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      loadScores();
-    }
-  }, [user]);
 
   // Save to local storage on change
   useEffect(() => {
@@ -331,13 +327,13 @@ function App() {
 
   // Auth handlers
   const handleSignIn = async (email: string, password: string) => {
-    setAuthError(null);
+    setAuthMessage(null);
     setAuthLoading(true);
     
     const { session, error } = await signIn(email, password);
     
     if (error) {
-      setAuthError('Email hoặc mật khẩu không đúng');
+      setAuthMessage({ text: 'Email hoặc mật khẩu không đúng', type: 'error' });
     } else if (session) {
       setUser(session.user);
     }
@@ -346,17 +342,15 @@ function App() {
   };
 
   const handleSignUp = async (email: string, password: string) => {
-    setAuthError(null);
+    setAuthMessage(null);
     setAuthLoading(true);
     
     const { user: newUser, error } = await signUp(email, password);
     
     if (error) {
-      setAuthError('Không thể tạo tài khoản. Vui lòng thử lại.');
+      setAuthMessage({ text: 'Không thể tạo tài khoản. Vui lòng thử lại.', type: 'error' });
     } else if (newUser) {
-      setAuthError(null);
-      // Show success message
-      setAuthError('Kiểm tra email của bạn để xác nhận tài khoản');
+      setAuthMessage({ text: 'Kiểm tra email của bạn để xác nhận tài khoản', type: 'success' });
     }
     
     setAuthLoading(false);
@@ -418,7 +412,7 @@ function App() {
       <Auth
         onSignIn={handleSignIn}
         onSignUp={handleSignUp}
-        error={authError}
+        message={authMessage}
         isLoading={authLoading}
       />
     );
