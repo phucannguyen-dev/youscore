@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, User as UserIcon, Search, X } from 'lucide-react';
-import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
+import { parseScoreFromText, parseScoresFromImage, parseBulkScoresFromText } from './services/geminiService';
 import { ScoreEntry, AppSettings, CustomFactor, Language } from './types';
 import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
@@ -244,38 +244,69 @@ function App() {
       // Extract factor names for the AI prompt
       const availableFactors = settings.customFactors.map(f => f.name);
       
-      const result = await parseScoreFromText(input, settings.defaultMaxScore, availableFactors, settings.customSubjects);
+      // First, try to parse as bulk input (multiple scores)
+      const bulkResults = await parseBulkScoresFromText(input, settings.defaultMaxScore, availableFactors, settings.customSubjects);
       
-      if (result) {
-        const newEntry: ScoreEntry = {
+      if (bulkResults && bulkResults.length > 0) {
+        // Handle bulk entries
+        const newEntries: ScoreEntry[] = bulkResults.map(result => ({
           ...result,
           id: crypto.randomUUID(),
           timestamp: Date.now(),
           originalText: input
-        };
+        }));
         
-        // Save to Supabase
-        const scoreData = scoreEntryToScore(newEntry);
-        const savedScore = await addScore(scoreData);
-        
-        // If Supabase save succeeded, use the returned data (with DB-generated id)
-        // Otherwise, use the local entry
-        if (savedScore) {
-          const entryWithDbId = scoreToScoreEntry(savedScore);
-          setScores(prev => [entryWithDbId, ...prev]);
-        } else {
-          // Fallback: save locally even if Supabase fails
-          setScores(prev => [newEntry, ...prev]);
+        // Save each entry to Supabase
+        const savedEntries: ScoreEntry[] = [];
+        for (const entry of newEntries) {
+          const scoreData = scoreEntryToScore(entry);
+          const savedScore = await addScore(scoreData);
+          
+          if (savedScore) {
+            savedEntries.push(scoreToScoreEntry(savedScore));
+          } else {
+            // Fallback to local entry if Supabase fails
+            savedEntries.push(entry);
+          }
         }
         
+        setScores(prev => [...savedEntries, ...prev]);
         setInput('');
         // Scroll to top of list smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        setError("Could not understand the score. Try 'Subject score was X/Y'");
+        // Fallback: try single score parsing for backward compatibility
+        const singleResult = await parseScoreFromText(input, settings.defaultMaxScore, availableFactors, settings.customSubjects);
+        
+        if (singleResult) {
+          const newEntry: ScoreEntry = {
+            ...singleResult,
+            id: crypto.randomUUID(),
+            timestamp: Date.now(),
+            originalText: input
+          };
+          
+          // Save to Supabase
+          const scoreData = scoreEntryToScore(newEntry);
+          const savedScore = await addScore(scoreData);
+          
+          if (savedScore) {
+            const entryWithDbId = scoreToScoreEntry(savedScore);
+            setScores(prev => [entryWithDbId, ...prev]);
+          } else {
+            // Fallback: save locally even if Supabase fails
+            setScores(prev => [newEntry, ...prev]);
+          }
+          
+          setInput('');
+          // Scroll to top of list smoothly
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          setError("Không thể hiểu được điểm số. Thử 'Điểm môn học là X/Y' hoặc 'Có Vật lý 10 và Toán 8 trong giữa học kỳ'");
+        }
       }
     } catch (err) {
-      setError("Something went wrong. Please check your connection.");
+      setError("Đã có lỗi xảy ra. Vui lòng kiểm tra kết nối của bạn.");
     } finally {
       setIsLoading(false);
     }
@@ -572,10 +603,40 @@ function App() {
                   <Sparkles className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Theo dõi điểm của bạn</h2>
-                <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+                <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                   Chỉ cần cho tôi biết điểm của bạn, và tôi sẽ sắp xếp <br/>
                   <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-2 block">"Tôi được 10 điểm Toán cuối học kỳ"</span>
+                  <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-1 block">"Có Vật lý 10 và Toán 8 trong giữa học kỳ"</span>
                 </p>
+              </div>
+            )}
+
+            {/* Search Bar - Now above the two-column layout */}
+            {scores.length > 0 && (
+              <div className="mb-6 print:hidden">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
+                    className="w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm rounded-lg py-2.5 pl-10 pr-10 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 px-1">
+                    Tìm thấy {filteredScores.length} kết quả
+                  </p>
+                )}
               </div>
             )}
 
@@ -597,34 +658,6 @@ function App() {
 
               {/* Right Column: History (Score List) */}
               <div>
-                {/* Search Bar */}
-                {scores.length > 0 && (
-                  <div className="mb-4 print:hidden">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
-                        className="w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm rounded-lg py-2.5 pl-10 pr-10 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                    {searchQuery && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 px-1">
-                        Tìm thấy {filteredScores.length} kết quả
-                      </p>
-                    )}
-                  </div>
-                )}
                 
                 {/* Recent List Header */}
                 {scores.length > 0 && (
@@ -763,7 +796,7 @@ function App() {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Nhập 'Được 10 điểm Toán' hoặc tải lên bảng điểm"
+                        placeholder="Nhập 'Có Vật lý 10 và Toán 8 trong giữa học kỳ' hoặc tải lên bảng điểm"
                         className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm sm:text-base rounded-full py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
                         disabled={isLoading}
                     />
