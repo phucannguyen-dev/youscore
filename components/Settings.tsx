@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Download, SlidersHorizontal, Calculator, Calendar, Database, Plus, Trash2, X, Save } from 'lucide-react';
-import { AppSettings, CustomFactor } from '../types';
+import { AppSettings, CustomFactor, SemesterDuration } from '../types';
 
 interface SettingsProps {
   onBack: () => void;
@@ -9,6 +9,21 @@ interface SettingsProps {
   onExport: () => void;
   onSaveSettings: () => Promise<void>;
 }
+
+const MONTHS = [
+  { value: 1, label: 'Tháng 1' },
+  { value: 2, label: 'Tháng 2' },
+  { value: 3, label: 'Tháng 3' },
+  { value: 4, label: 'Tháng 4' },
+  { value: 5, label: 'Tháng 5' },
+  { value: 6, label: 'Tháng 6' },
+  { value: 7, label: 'Tháng 7' },
+  { value: 8, label: 'Tháng 8' },
+  { value: 9, label: 'Tháng 9' },
+  { value: 10, label: 'Tháng 10' },
+  { value: 11, label: 'Tháng 11' },
+  { value: 12, label: 'Tháng 12' },
+];
 
 export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSettings, onExport, onSaveSettings }) => {
   const [newFactorName, setNewFactorName] = useState('');
@@ -74,6 +89,57 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
     handleChange('customSubjects', currentSubjects.filter(s => s !== subject));
   };
 
+  const handleSemesterDurationChange = (index: number, field: 'startMonth' | 'endMonth', value: number) => {
+    const durations = settings.semesterDurations || [];
+    const newDurations = [...durations];
+    
+    if (!newDurations[index]) {
+      newDurations[index] = { startMonth: 9, endMonth: 6 };
+    }
+    
+    newDurations[index] = {
+      ...newDurations[index],
+      [field]: value
+    };
+    
+    handleChange('semesterDurations', newDurations);
+  };
+
+  // Initialize semester durations based on semestersPerYear
+  const initializeSemesterDurations = () => {
+    const count = settings.semestersPerYear || 2;
+    const durations: SemesterDuration[] = [];
+    
+    for (let i = 0; i < count; i++) {
+      if (settings.semesterDurations && settings.semesterDurations[i]) {
+        durations.push(settings.semesterDurations[i]);
+      } else {
+        // Default values for each semester
+        if (count === 1) {
+          durations.push({ startMonth: 9, endMonth: 6 });
+        } else if (count === 2) {
+          durations.push(i === 0 ? { startMonth: 9, endMonth: 12 } : { startMonth: 1, endMonth: 6 });
+        } else if (count === 3) {
+          durations.push(
+            i === 0 ? { startMonth: 9, endMonth: 12 } :
+            i === 1 ? { startMonth: 1, endMonth: 4 } :
+            { startMonth: 5, endMonth: 8 }
+          );
+        } else {
+          // For 4 semesters
+          durations.push(
+            i === 0 ? { startMonth: 9, endMonth: 11 } :
+            i === 1 ? { startMonth: 12, endMonth: 2 } :
+            i === 2 ? { startMonth: 3, endMonth: 5 } :
+            { startMonth: 6, endMonth: 8 }
+          );
+        }
+      }
+    }
+    
+    return durations;
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-20">
       <div className="flex items-center justify-between gap-4 mb-2">
@@ -102,28 +168,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
           {isSaving ? 'Đang lưu...' : 'Lưu cài đặt'}
         </button>
       </div>
-      
-      {/* Language Selection */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4" /> Ngôn ngữ / Language
-        </h3>
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-6">
-            <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Chọn ngôn ngữ / Select Language
-                </label>
-                <select 
-                    value={settings.language}
-                    onChange={(e) => handleChange('language', e.target.value as 'vi' | 'en')}
-                    className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                >
-                    <option value="vi">Tiếng Việt</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-        </div>
-      </section>
       
       {/* Display & Sort */}
       <section className="space-y-4">
@@ -378,6 +422,62 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                     <option value="4">4 (4 học kỳ)</option>
                 </select>
             </div>
+        </div>
+      </section>
+
+      {/* Semester Durations */}
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <Calendar className="w-4 h-4" /> Cài đặt học kỳ
+        </h3>
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Đặt tháng bắt đầu và kết thúc cho từng học kỳ
+          </p>
+          
+          {initializeSemesterDurations().map((duration, index) => (
+            <div key={index} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-3">
+              <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Học kỳ {index + 1}
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                    Tháng bắt đầu
+                  </label>
+                  <select 
+                    value={duration.startMonth}
+                    onChange={(e) => handleSemesterDurationChange(index, 'startMonth', parseInt(e.target.value))}
+                    className="w-full p-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  >
+                    {MONTHS.map(month => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                    Tháng kết thúc
+                  </label>
+                  <select 
+                    value={duration.endMonth}
+                    onChange={(e) => handleSemesterDurationChange(index, 'endMonth', parseInt(e.target.value))}
+                    className="w-full p-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  >
+                    {MONTHS.map(month => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
