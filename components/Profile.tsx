@@ -144,170 +144,180 @@ export const Profile: React.FC<ProfileProps> = ({
         </div>
       )}
 
-      {/* User Information */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <UserCircle className="w-4 h-4" /> Thông tin cá nhân
-        </h3>
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Email
-            </label>
-            <input 
-              type="email"
-              value={userEmail || 'Đang tải...'}
-              disabled
-              className="w-full p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
-            />
-            <p className="text-xs text-slate-500 mt-1">Email không thể thay đổi</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Tên hiển thị
-            </label>
-            <input 
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Nhập tên của bạn"
-              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-            />
-          </div>
-
-          <button 
-            onClick={handleSaveProfile}
-            disabled={isSaving}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
-          >
-            {isSaving ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-            {isSaving ? 'Đang lưu...' : 'Lưu thông tin'}
-          </button>
-        </div>
-      </section>
-
-      {/* Change Password */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <Lock className="w-4 h-4" /> Thay đổi mật khẩu
-        </h3>
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Mật khẩu mới
-            </label>
-            <input 
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Xác nhận mật khẩu mới
-            </label>
-            <input 
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Nhập lại mật khẩu mới"
-              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-            />
-          </div>
-
-          <button 
-            onClick={handleChangePassword}
-            disabled={isSaving || !newPassword || !confirmPassword}
-            className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 disabled:bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-600 dark:disabled:bg-slate-800 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
-          >
-            <Lock className="w-4 h-4" />
-            Thay đổi mật khẩu
-          </button>
-        </div>
-      </section>
-
-      {/* Sign Out */}
-      <section className="space-y-4">
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
-          <button 
-            onClick={onSignOut}
-            className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
-          >
-            <LogOut className="w-4 h-4" />
-            Đăng xuất
-          </button>
-        </div>
-      </section>
-
-      {/* Delete Account */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider flex items-center gap-2">
-          <Trash2 className="w-4 h-4" /> Vùng nguy hiểm
-        </h3>
-        <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-5 shadow-sm border border-red-200 dark:border-red-800 space-y-4">
-          {!showDeleteConfirm ? (
-            <>
-              <p className="text-sm text-red-700 dark:text-red-300">
-                Xóa tài khoản của bạn và tất cả dữ liệu liên quan. Hành động này không thể hoàn tác.
-              </p>
-              <button 
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
-              >
-                <Trash2 className="w-4 h-4" />
-                Xóa tài khoản
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-sm text-red-700 dark:text-red-300 font-medium">
-                Bạn có chắc chắn muốn xóa tài khoản của mình không?
-              </p>
-              <p className="text-xs text-red-600 dark:text-red-400">
-                Nhập <strong>XÓA TÀI KHOẢN</strong> để xác nhận
-              </p>
-              <input 
-                type="text"
-                value={deleteConfirmText}
-                onChange={(e) => setDeleteConfirmText(e.target.value)}
-                placeholder="XÓA TÀI KHOẢN"
-                className="w-full p-2.5 rounded-lg bg-white dark:bg-slate-800 border-2 border-red-300 dark:border-red-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
-              />
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => {
-                    setShowDeleteConfirm(false);
-                    setDeleteConfirmText('');
-                  }}
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium transition-colors"
-                >
-                  Hủy
-                </button>
-                <button 
-                  onClick={handleDeleteAccount}
-                  disabled={isDeleting || deleteConfirmText !== 'XÓA TÀI KHOẢN'}
-                  className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 dark:disabled:bg-red-900/50 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
-                >
-                  {isDeleting ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <Trash2 className="w-4 h-4" />
-                  )}
-                  {isDeleting ? 'Đang xóa...' : 'Xác nhận xóa'}
-                </button>
+      {/* Desktop: Two-column layout, Mobile: Single column */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+        
+        {/* Left Column: User Info & Password */}
+        <div className="space-y-6">
+          {/* User Information */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <UserCircle className="w-4 h-4" /> Thông tin cá nhân
+            </h3>
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Email
+                </label>
+                <input 
+                  type="email"
+                  value={userEmail || 'Đang tải...'}
+                  disabled
+                  className="w-full p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                />
+                <p className="text-xs text-slate-500 mt-1">Email không thể thay đổi</p>
               </div>
-            </>
-          )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Tên hiển thị
+                </label>
+                <input 
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Nhập tên của bạn"
+                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                />
+              </div>
+
+              <button 
+                onClick={handleSaveProfile}
+                disabled={isSaving}
+                className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
+              >
+                {isSaving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                {isSaving ? 'Đang lưu...' : 'Lưu thông tin'}
+              </button>
+            </div>
+          </section>
+
+          {/* Change Password */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <Lock className="w-4 h-4" /> Thay đổi mật khẩu
+            </h3>
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Mật khẩu mới
+                </label>
+                <input 
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Xác nhận mật khẩu mới
+                </label>
+                <input 
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Nhập lại mật khẩu mới"
+                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                />
+              </div>
+
+              <button 
+                onClick={handleChangePassword}
+                disabled={isSaving || !newPassword || !confirmPassword}
+                className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 disabled:bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-600 dark:disabled:bg-slate-800 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+              >
+                <Lock className="w-4 h-4" />
+                Thay đổi mật khẩu
+              </button>
+            </div>
+          </section>
         </div>
-      </section>
+
+        {/* Right Column: Sign Out & Danger Zone */}
+        <div className="space-y-6 lg:mt-0 mt-6">
+          {/* Sign Out */}
+          <section className="space-y-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+              <button 
+                onClick={onSignOut}
+                className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+              >
+                <LogOut className="w-4 h-4" />
+                Đăng xuất
+              </button>
+            </div>
+          </section>
+
+          {/* Delete Account */}
+          <section className="space-y-4">
+            <h3 className="text-sm font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider flex items-center gap-2">
+              <Trash2 className="w-4 h-4" /> Vùng nguy hiểm
+            </h3>
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-5 shadow-sm border border-red-200 dark:border-red-800 space-y-4">
+              {!showDeleteConfirm ? (
+                <>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    Xóa tài khoản của bạn và tất cả dữ liệu liên quan. Hành động này không thể hoàn tác.
+                  </p>
+                  <button 
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Xóa tài khoản
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+                    Bạn có chắc chắn muốn xóa tài khoản của mình không?
+                  </p>
+                  <p className="text-xs text-red-600 dark:text-red-400">
+                    Nhập <strong>XÓA TÀI KHOẢN</strong> để xác nhận
+                  </p>
+                  <input 
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="XÓA TÀI KHOẢN"
+                    className="w-full p-2.5 rounded-lg bg-white dark:bg-slate-800 border-2 border-red-300 dark:border-red-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                  />
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => {
+                        setShowDeleteConfirm(false);
+                        setDeleteConfirmText('');
+                      }}
+                      className="flex-1 px-4 py-2.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium transition-colors"
+                    >
+                      Hủy
+                    </button>
+                    <button 
+                      onClick={handleDeleteAccount}
+                      disabled={isDeleting || deleteConfirmText !== 'XÓA TÀI KHOẢN'}
+                      className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 dark:disabled:bg-red-900/50 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                    >
+                      {isDeleting ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                      {isDeleting ? 'Đang xóa...' : 'Xác nhận xóa'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   );
 };

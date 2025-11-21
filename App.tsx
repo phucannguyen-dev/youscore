@@ -7,7 +7,7 @@ import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
 import { Profile } from './components/Profile';
 import { Auth } from './components/Auth';
-import { addScore, getScores, deleteScore, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
+import { addScore, getScores, deleteScore, updateScore, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
 import { useTranslation } from './lib/translations';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
@@ -422,8 +422,24 @@ function App() {
     }
   };
 
-  const handleUpdateScore = (id: string, updates: Partial<ScoreEntry>) => {
+  const handleUpdateScore = async (id: string, updates: Partial<ScoreEntry>) => {
+    // Update local state immediately for responsive UI
     setScores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    
+    // Sync to Supabase if user is logged in
+    if (user) {
+      // Convert ScoreEntry updates to Score format
+      const scoreUpdates: Partial<Omit<Score, 'id' | 'created_at' | 'user_id'>> = {};
+      
+      if (updates.subject !== undefined) scoreUpdates.subject = updates.subject;
+      if (updates.score !== undefined) scoreUpdates.score = updates.score;
+      if (updates.maxScore !== undefined) scoreUpdates.max_score = updates.maxScore;
+      if (updates.examType !== undefined) scoreUpdates.exam_type = updates.examType;
+      if (updates.timestamp !== undefined) scoreUpdates.timestamp = updates.timestamp;
+      if (updates.originalText !== undefined) scoreUpdates.original_text = updates.originalText;
+      
+      await updateScore(id, scoreUpdates);
+    }
   };
 
   // Auth handlers

@@ -39,7 +39,10 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({ score: '', max: '' });
+  const [isEditingSubject, setIsEditingSubject] = useState(false);
+  const [editSubject, setEditSubject] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const subjectInputRef = useRef<HTMLInputElement>(null);
   
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -79,6 +82,13 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
       }
   }, [isEditing]);
 
+  useEffect(() => {
+      if (isEditingSubject && subjectInputRef.current) {
+          subjectInputRef.current.focus();
+          subjectInputRef.current.select();
+      }
+  }, [isEditingSubject]);
+
   const saveEdit = () => {
       const s = parseFloat(editValues.score);
       const m = parseFloat(editValues.max);
@@ -92,9 +102,32 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
       setIsEditing(false);
   };
 
+  const startEditingSubject = (e: React.MouseEvent) => {
+      if (isSelectMode) return;
+      e.stopPropagation();
+      setEditSubject(entry.subject);
+      setIsEditingSubject(true);
+  };
+
+  const saveSubjectEdit = () => {
+      if (editSubject.trim() && editSubject.trim() !== entry.subject) {
+          onUpdate(entry.id, { subject: editSubject.trim() });
+      }
+      setIsEditingSubject(false);
+  };
+
+  const cancelSubjectEdit = () => {
+      setIsEditingSubject(false);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') saveEdit();
       if (e.key === 'Escape') cancelEdit();
+  };
+
+  const handleSubjectKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') saveSubjectEdit();
+      if (e.key === 'Escape') cancelSubjectEdit();
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,7 +276,40 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
             )}
           </div>
         </div>
-        <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate" title={entry.subject}>{entry.subject}</h3>
+        
+        {/* Subject - Now Editable */}
+        {isEditingSubject ? (
+          <div className="flex items-center gap-2 mb-1" onClick={e => e.stopPropagation()}>
+            <input 
+              ref={subjectInputRef}
+              type="text" 
+              value={editSubject}
+              onChange={e => setEditSubject(e.target.value)}
+              onKeyDown={handleSubjectKeyDown}
+              className="flex-1 text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border-b-2 border-indigo-500 focus:outline-none px-1 py-0.5"
+            />
+            <button onClick={saveSubjectEdit} className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded">
+              <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+            <button onClick={cancelSubjectEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
+              <X className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 group/subject mb-1">
+            <h3 
+              onClick={startEditingSubject}
+              className={`text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate ${isSelectMode ? '' : 'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400'}`}
+              title={isSelectMode ? entry.subject : `${entry.subject} (Click to edit)`}
+            >
+              {entry.subject}
+            </h3>
+            {!isSelectMode && (
+              <Pencil className="w-3 h-3 text-slate-300 dark:text-slate-600 opacity-0 group-hover/subject:opacity-100 transition-opacity" />
+            )}
+          </div>
+        )}
+        
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 italic truncate print:hidden" title={entry.originalText}>"{entry.originalText}"</p>
       </div>
 
