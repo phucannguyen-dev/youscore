@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut } from 'lucide-react';
+import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut, User as UserIcon } from 'lucide-react';
 import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
 import { ScoreEntry, AppSettings, CustomFactor, Language } from './types';
 import { ScoreCard } from './components/ScoreCard';
 import { Dashboard } from './components/Dashboard';
 import { Settings } from './components/Settings';
+import { Profile } from './components/Profile';
 import { Auth } from './components/Auth';
 import { addScore, getScores, deleteScore, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
 import { useTranslation } from './lib/translations';
@@ -81,7 +82,7 @@ function App() {
   const [scores, setScores] = useState<ScoreEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'settings'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'settings' | 'profile'>('home');
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -512,9 +513,18 @@ function App() {
                 Beta
             </div>
             <button 
+                onClick={() => setCurrentView(currentView === 'profile' ? 'home' : 'profile')}
+                className={`p-2 rounded-full transition-colors ${currentView === 'profile' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                aria-label="Hồ sơ"
+                title="Hồ sơ cá nhân"
+            >
+                <UserIcon className="w-5 h-5" />
+            </button>
+            <button 
                 onClick={() => setCurrentView(currentView === 'settings' ? 'home' : 'settings')}
                 className={`p-2 rounded-full transition-colors ${currentView === 'settings' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
-                aria-label="Settings"
+                aria-label="Cài đặt"
+                title="Cài đặt"
             >
                 <SettingsIcon className="w-5 h-5" />
             </button>
@@ -633,12 +643,20 @@ function App() {
               <div ref={bottomRef} />
             </div>
           </>
-        ) : (
+        ) : currentView === 'settings' ? (
           <Settings 
             onBack={() => setCurrentView('home')} 
             settings={settings}
             onUpdateSettings={setSettings}
             onExport={handleExport}
+            onSaveSettings={handleSaveSettings}
+          />
+        ) : (
+          <Profile 
+            onBack={() => setCurrentView('home')}
+            onAccountDeleted={handleSignOut}
+            settings={settings}
+            onUpdateSettings={setSettings}
             onSaveSettings={handleSaveSettings}
           />
         )}
