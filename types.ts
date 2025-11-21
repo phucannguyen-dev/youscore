@@ -41,6 +41,8 @@ export interface AppSettings {
   customFactors: CustomFactor[];
   language: Language;
   customSubjects: string[];
+  semesterStartMonth?: number;
+  semesterEndMonth?: number;
 }
 
 export interface UserProfile {
