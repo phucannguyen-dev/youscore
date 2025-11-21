@@ -585,9 +585,9 @@ function App() {
           </div>
           
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="hidden sm:inline-flex">
+            {/*<Badge variant="secondary" className="hidden sm:inline-flex">
                 Beta
-            </Badge>
+            </Badge>*/}
             <Button 
                 variant="ghost"
                 size="icon"
@@ -627,7 +627,7 @@ function App() {
              {/* Print Header */}
             <div className="hidden print:block mb-6 text-center">
                 <h1 className="text-3xl font-bold text-black">Báo cáo của YouScore</h1>
-                <p className="text-gray-500">Tạo bởi {new Date().toLocaleDateString()}</p>
+                <p className="text-gray-500">Tạo vào ngày {new Date().toLocaleDateString()}</p>
             </div>
 
             {/* Welcome / Empty State */}
@@ -640,7 +640,7 @@ function App() {
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                   Chỉ cần cho tôi biết điểm của bạn, và tôi sẽ sắp xếp <br/>
                   <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-2 block">"Tôi được 10 điểm Toán cuối học kỳ"</span>
-                  <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-1 block">"Có Vật lý 10 và Toán 8 trong giữa học kỳ"</span>
+                  <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-1 block">"Được Vật lý 10 và Toán 8 trong giữa học kỳ"</span>
                 </p>
               </div>
             )}

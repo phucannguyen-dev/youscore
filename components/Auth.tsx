@@ -45,10 +45,10 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
         <div className="relative z-10 text-white">
           <blockquote className="space-y-2">
             <p className="text-lg md:text-xl font-medium leading-relaxed">
-              "Web hay, phù hợp để ghi lại điểm số, quá tuyệt vời :D"
+              "Web hay, phù hợp để ghi lại điểm số, quá tuyệt vời!"
             </p>
             <footer className="text-sm text-slate-400">
-              - Nhân
+              - Thành Nhân
             </footer>
           </blockquote>
         </div>
@@ -74,9 +74,9 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
             className="text-sm"
           >
             {isSignUp ? (
-              <>Đăng nhập / <span className="text-muted-foreground">Login</span></>
+              <>Đăng nhập</>
             ) : (
-              <>Đăng ký / <span className="text-muted-foreground">Sign up</span></>
+              <>Đăng ký</>
             )}
           </Button>
         </div>
@@ -95,9 +95,9 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
               </h2>
               <p className="text-sm text-muted-foreground">
                 {isSignUp ? (
-                  <>Nhập email của bạn để tạo tài khoản / <span className="block sm:inline">Enter your email below to create your account</span></>
+                  <>Nhập email của bạn để tạo tài khoản</>
                 ) : (
-                  <>Nhập email và mật khẩu để đăng nhập / <span className="block sm:inline">Enter your email and password to sign in</span></>
+                  <>Nhập email và mật khẩu để đăng nhập</>
                 )}
               </p>
             </div>
@@ -140,7 +140,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
               {/* Password Input */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
-                  Mật khẩu / <span className="text-muted-foreground">Password</span>
+                  Mật khẩu
                 </Label>
                 <Input
                   id="password"
@@ -164,16 +164,16 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : isSignUp ? (
-                  <>Đăng ký bằng email / Sign up with Email</>
+                  <>Đăng ký bằng email</>
                 ) : (
-                  <>Đăng nhập bằng email / Sign in with Email</>
+                  <>Đăng nhập bằng email</>
                 )}
               </Button>
             </form>
 
             {/* Footer Note */}
             <p className="text-center text-xs text-muted-foreground">
-              Dữ liệu của bạn được bảo mật và lưu trữ an toàn /<br className="sm:hidden" /> Your data is secure and stored safely
+              Dữ liệu của bạn được bảo mật và lưu trữ an toàn
             </p>
           </div>
         </div>
