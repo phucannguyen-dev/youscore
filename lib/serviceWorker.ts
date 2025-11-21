@@ -7,10 +7,17 @@ export function registerServiceWorker() {
         .then((registration) => {
           console.log('SW registered:', registration);
           
-          // Check for updates periodically
+          // Check for updates every 30 minutes (reduced from 1 minute for battery efficiency)
           setInterval(() => {
             registration.update();
-          }, 60000); // Check every minute
+          }, 1800000); // 30 minutes
+          
+          // Also check for updates when the page becomes visible
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              registration.update();
+            }
+          });
           
           // Handle updates
           registration.addEventListener('updatefound', () => {
@@ -18,10 +25,12 @@ export function registerServiceWorker() {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New service worker available, prompt user to refresh
+                  // New service worker available
                   console.log('New content available; please refresh.');
                   
-                  // Optionally, you can show a notification to the user
+                  // Show a simple notification using the app's existing UI patterns
+                  // For now, using confirm as a minimal implementation
+                  // TODO: Replace with custom notification component matching app design
                   if (confirm('New version available! Reload to update?')) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
                     window.location.reload();
