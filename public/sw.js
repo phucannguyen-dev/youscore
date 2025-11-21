@@ -64,10 +64,16 @@ self.addEventListener('fetch', (event) => {
 
   // For API requests (Supabase, external APIs), use network-first strategy
   if (url.pathname.includes('/api/') || 
-      url.hostname.includes('supabase') || 
-      url.hostname.includes('google') ||
-      url.hostname.includes('vercel') ||
-      url.hostname.includes('aistudiocdn.com')) {
+      url.hostname === 'supabase.co' ||
+      url.hostname.endsWith('.supabase.co') ||
+      url.hostname === 'google.com' ||
+      url.hostname.endsWith('.google.com') ||
+      url.hostname === 'googleapis.com' ||
+      url.hostname.endsWith('.googleapis.com') ||
+      url.hostname === 'vercel.com' ||
+      url.hostname.endsWith('.vercel.com') ||
+      url.hostname === 'aistudiocdn.com' ||
+      url.hostname.endsWith('.aistudiocdn.com')) {
     event.respondWith(
       fetch(request)
         .catch(() => {
