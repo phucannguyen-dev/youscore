@@ -1,39 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, UserCircle, Lock, Trash2, Calendar } from 'lucide-react';
-import { getUserProfile, upsertUserProfile, updatePassword, deleteAccount, UserProfile } from '../lib/supabase';
+import { ArrowLeft, Save, UserCircle, Lock, Trash2 } from 'lucide-react';
+import { getUserProfile, upsertUserProfile, updatePassword, deleteAccount, UserProfile, getCurrentUser } from '../lib/supabase';
 import { AppSettings } from '../types';
 
 interface ProfileProps {
   onBack: () => void;
   onAccountDeleted: () => void;
-  settings: AppSettings;
-  onUpdateSettings: (newSettings: AppSettings) => void;
-  onSaveSettings: () => Promise<void>;
 }
-
-const MONTHS = [
-  { value: 1, label: 'Tháng 1' },
-  { value: 2, label: 'Tháng 2' },
-  { value: 3, label: 'Tháng 3' },
-  { value: 4, label: 'Tháng 4' },
-  { value: 5, label: 'Tháng 5' },
-  { value: 6, label: 'Tháng 6' },
-  { value: 7, label: 'Tháng 7' },
-  { value: 8, label: 'Tháng 8' },
-  { value: 9, label: 'Tháng 9' },
-  { value: 10, label: 'Tháng 10' },
-  { value: 11, label: 'Tháng 11' },
-  { value: 12, label: 'Tháng 12' },
-];
 
 export const Profile: React.FC<ProfileProps> = ({ 
   onBack, 
-  onAccountDeleted,
-  settings,
-  onUpdateSettings,
-  onSaveSettings
+  onAccountDeleted
 }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
   const [fullName, setFullName] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -52,6 +32,12 @@ export const Profile: React.FC<ProfileProps> = ({
     if (userProfile) {
       setProfile(userProfile);
       setFullName(userProfile.full_name || '');
+    }
+    
+    // Get user email from auth
+    const { user } = await getCurrentUser();
+    if (user?.email) {
+      setUserEmail(user.email);
     }
   };
 
@@ -132,14 +118,6 @@ export const Profile: React.FC<ProfileProps> = ({
     }
   };
 
-  const handleSemesterMonthChange = async (field: 'semesterStartMonth' | 'semesterEndMonth', value: number) => {
-    const newSettings = { ...settings, [field]: value };
-    onUpdateSettings(newSettings);
-    
-    // Auto-save to cloud
-    await onSaveSettings();
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-20">
       <div className="flex items-center gap-4 mb-2">
@@ -176,7 +154,7 @@ export const Profile: React.FC<ProfileProps> = ({
             </label>
             <input 
               type="email"
-              value={profile?.user_id || 'Đang tải...'}
+              value={userEmail || 'Đang tải...'}
               disabled
               className="w-full p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
             />
@@ -251,56 +229,6 @@ export const Profile: React.FC<ProfileProps> = ({
             <Lock className="w-4 h-4" />
             Thay đổi mật khẩu
           </button>
-        </div>
-      </section>
-
-      {/* Semester Months */}
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <Calendar className="w-4 h-4" /> Cài đặt học kỳ
-        </h3>
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Đặt tháng bắt đầu và kết thúc học kỳ của bạn
-          </p>
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Tháng bắt đầu học kỳ
-            </label>
-            <select 
-              value={settings.semesterStartMonth || 9}
-              onChange={(e) => handleSemesterMonthChange('semesterStartMonth', parseInt(e.target.value))}
-              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-            >
-              {MONTHS.map(month => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Tháng kết thúc học kỳ
-            </label>
-            <select 
-              value={settings.semesterEndMonth || 6}
-              onChange={(e) => handleSemesterMonthChange('semesterEndMonth', parseInt(e.target.value))}
-              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-            >
-              {MONTHS.map(month => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <p className="text-xs text-slate-500">
-            Cài đặt này sẽ được lưu tự động
-          </p>
         </div>
       </section>
 

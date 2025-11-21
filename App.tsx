@@ -655,9 +655,6 @@ function App() {
           <Profile 
             onBack={() => setCurrentView('home')}
             onAccountDeleted={handleSignOut}
-            settings={settings}
-            onUpdateSettings={setSettings}
-            onSaveSettings={handleSaveSettings}
           />
         )}
 

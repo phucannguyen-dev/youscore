@@ -32,6 +32,11 @@ export interface CustomFactor {
   multiplier: number;
 }
 
+export interface SemesterDuration {
+  startMonth: number;
+  endMonth: number;
+}
+
 export interface AppSettings {
   sortOption: 'date_desc' | 'date_asc' | 'subject_asc' | 'subject_desc' | 'score_high' | 'score_low';
   rounding: 0 | 1 | 2;
@@ -41,6 +46,8 @@ export interface AppSettings {
   customFactors: CustomFactor[];
   language: Language;
   customSubjects: string[];
+  semesterDurations?: SemesterDuration[];
+  // Deprecated - keeping for backward compatibility
   semesterStartMonth?: number;
   semesterEndMonth?: number;
 }
