@@ -289,6 +289,10 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
               onKeyDown={handleSubjectKeyDown}
               className="flex-1 text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border-b-2 border-indigo-500 focus:outline-none px-1 py-0.5 cursor-pointer"
             >
+              {/* Include current subject if not in availableSubjects list */}
+              {!availableSubjects.includes(editSubject) && editSubject && (
+                <option key={editSubject} value={editSubject}>{editSubject}</option>
+              )}
               {availableSubjects.map(subject => (
                 <option key={subject} value={subject}>{subject}</option>
               ))}
@@ -345,7 +349,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
         ) : (
             <div 
                 onClick={startEditing}
-                className={`relative flex flex-col items-end px-2 sm:px-3 py-1 rounded-lg border ${colorClass} transition-all group/score select-none ${isSelectMode ? '' : 'cursor-pointer hover:brightness-95'}`}
+                className={`relative flex flex-col items-end px-2 sm:px-3 py-1 rounded-lg border ${colorClass} transition-all group/score select-none min-w-[80px] sm:min-w-[90px] ${isSelectMode ? '' : 'cursor-pointer hover:brightness-95'}`}
                 title={isSelectMode ? undefined : "Click to edit marks"}
             >
                 {!isSelectMode && (
