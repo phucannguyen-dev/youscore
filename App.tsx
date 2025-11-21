@@ -497,7 +497,7 @@ function App() {
       
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-10 bg-opacity-80 dark:bg-opacity-80 backdrop-blur-md transition-colors print:hidden">
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="mx-auto px-4 h-16 flex items-center justify-between lg:max-w-7xl md:max-w-4xl max-w-2xl">
           <div 
             className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 cursor-pointer"
             onClick={() => setCurrentView('home')}
@@ -514,40 +514,40 @@ function App() {
             </div>
             <button 
                 onClick={() => setCurrentView(currentView === 'profile' ? 'home' : 'profile')}
-                className={`p-2 rounded-full transition-colors ${currentView === 'profile' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                className={`p-1.5 sm:p-2 rounded-full transition-colors ${currentView === 'profile' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                 aria-label="Hồ sơ"
                 title="Hồ sơ cá nhân"
             >
-                <UserIcon className="w-5 h-5" />
+                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button 
                 onClick={() => setCurrentView(currentView === 'settings' ? 'home' : 'settings')}
-                className={`p-2 rounded-full transition-colors ${currentView === 'settings' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                className={`p-1.5 sm:p-2 rounded-full transition-colors ${currentView === 'settings' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                 aria-label="Cài đặt"
                 title="Cài đặt"
             >
-                <SettingsIcon className="w-5 h-5" />
+                <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button 
                 onClick={toggleTheme}
-                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                className="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                 aria-label="Giao diện"
             >
-                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                {isDarkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
             </button>
             <button 
                 onClick={handleSignOut}
-                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                className="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                 aria-label="Đăng xuất"
                 title="Đăng xuất"
             >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6 print:px-0 print:py-0 print:max-w-none">
+      <main className="mx-auto px-4 py-6 print:px-0 print:py-0 print:max-w-none lg:max-w-7xl md:max-w-4xl max-w-2xl">
         
         {currentView === 'home' ? (
           <>
@@ -571,76 +571,84 @@ function App() {
               </div>
             )}
 
-            {/* Dashboard */}
-            <Dashboard 
-                scores={scores} 
-                isDarkMode={isDarkMode} 
-                rounding={settings.rounding} 
-                customFactors={settings.customFactors}
-                defaultMaxScore={settings.defaultMaxScore}
-                semestersPerYear={settings.semestersPerYear}
-            />
-
-            {/* Recent List Header */}
-            {scores.length > 0 && (
-                <div className="flex items-center justify-between mb-4 px-1">
-                    <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                        <History className="w-4 h-4" /> Lịch sử
-                    </h2>
-                    <div className="flex gap-2 print:hidden">
-                      {isSelectMode ? (
-                        <button 
-                          onClick={() => {
-                            if (selectedIds.size === scores.length) {
-                              setSelectedIds(new Set());
-                            } else {
-                              setSelectedIds(new Set(scores.map(s => s.id)));
-                            }
-                          }}
-                          className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-                        >
-                          {selectedIds.size === scores.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={toggleSelectMode}
-                          className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors"
-                        >
-                          <CheckSquare className="w-3.5 h-3.5" /> Chọn
-                        </button>
-                      )}
-                    </div>
-                </div>
-            )}
-
-            {/* Score List */}
-            <div className="space-y-3 mb-24 print:mb-0">
-              {isLoading && (
-                 <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-indigo-100 dark:border-indigo-900/30 animate-pulse flex gap-4">
-                    <div className="flex-1 space-y-3">
-                        <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
-                        <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
-                        <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
-                    </div>
-                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg"></div>
-                 </div>
-              )}
-              
-              {sortedScores.map(score => (
-                <ScoreCard 
-                    key={score.id} 
-                    entry={score} 
-                    onDelete={handleDelete} 
-                    rounding={settings.rounding}
-                    showDate={settings.showDates}
-                    availableTypes={availableFactors}
-                    onUpdate={handleUpdateScore}
-                    isSelectMode={isSelectMode}
-                    isSelected={selectedIds.has(score.id)}
-                    onToggleSelect={handleToggleSelection}
+            {/* Desktop: Two-column layout, Mobile: Single column */}
+            <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
+              {/* Left Column: Dashboard (Summary & Subject Groups) */}
+              <div className="lg:sticky lg:top-20">
+                <Dashboard 
+                    scores={scores} 
+                    isDarkMode={isDarkMode} 
+                    rounding={settings.rounding} 
+                    customFactors={settings.customFactors}
+                    defaultMaxScore={settings.defaultMaxScore}
+                    semestersPerYear={settings.semestersPerYear}
                 />
-              ))}
-              <div ref={bottomRef} />
+              </div>
+
+              {/* Right Column: History (Score List) */}
+              <div>
+                {/* Recent List Header */}
+                {scores.length > 0 && (
+                    <div className="flex items-center justify-between mb-4 px-1">
+                        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                            <History className="w-4 h-4" /> Lịch sử
+                        </h2>
+                        <div className="flex gap-2 print:hidden">
+                          {isSelectMode ? (
+                            <button 
+                              onClick={() => {
+                                if (selectedIds.size === scores.length) {
+                                  setSelectedIds(new Set());
+                                } else {
+                                  setSelectedIds(new Set(scores.map(s => s.id)));
+                                }
+                              }}
+                              className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                            >
+                              {selectedIds.size === scores.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={toggleSelectMode}
+                              className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors"
+                            >
+                              <CheckSquare className="w-3.5 h-3.5" /> Chọn
+                            </button>
+                          )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Score List */}
+                <div className="space-y-3 mb-24 lg:mb-32 print:mb-0">
+                  {isLoading && (
+                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-indigo-100 dark:border-indigo-900/30 animate-pulse flex gap-4">
+                        <div className="flex-1 space-y-3">
+                            <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
+                            <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+                            <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2"></div>
+                        </div>
+                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg"></div>
+                     </div>
+                  )}
+                  
+                  {sortedScores.map(score => (
+                    <ScoreCard 
+                        key={score.id} 
+                        entry={score} 
+                        onDelete={handleDelete} 
+                        rounding={settings.rounding}
+                        showDate={settings.showDates}
+                        availableTypes={availableFactors}
+                        onUpdate={handleUpdateScore}
+                        isSelectMode={isSelectMode}
+                        isSelected={selectedIds.has(score.id)}
+                        onToggleSelect={handleToggleSelection}
+                    />
+                  ))}
+                  <div ref={bottomRef} />
+                </div>
+              </div>
             </div>
           </>
         ) : currentView === 'settings' ? (
@@ -663,7 +671,7 @@ function App() {
       {/* Input Area or Bulk Actions - Sticky Bottom (Only on Home) */}
       {currentView === 'home' && (
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 z-20 transition-colors print:hidden">
-           <div className="max-w-2xl mx-auto relative">
+           <div className="mx-auto relative lg:max-w-7xl md:max-w-4xl max-w-2xl">
               {error && !isSelectMode && (
                   <div className="absolute -top-16 left-0 right-0 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-xs py-2 px-3 rounded-lg border border-red-100 dark:border-red-800 text-center mb-2">
                       {error}
@@ -697,11 +705,11 @@ function App() {
                     <button 
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 p-2 transition-colors rounded-full"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 p-1.5 sm:p-2 transition-colors rounded-full"
                         title="Upload score image"
                         disabled={isLoading}
                     >
-                        <Camera className="w-5 h-5" />
+                        <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                     <input 
                         type="file" 
@@ -716,18 +724,18 @@ function App() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Nhập 'Được 10 điểm Toán' hoặc tải lên bảng điểm"
-                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-base rounded-full py-3 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
+                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm sm:text-base rounded-full py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
                         disabled={isLoading}
                     />
                     <button 
                         type="submit" 
                         disabled={isLoading || !input.trim()}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white p-2 rounded-full transition-colors shadow-md"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white p-1.5 sm:p-2 rounded-full transition-colors shadow-md"
                     >
                         {isLoading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
-                            <Send className="w-5 h-5 ml-0.5" />
+                            <Send className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />
                         )}
                     </button>
                 </form>

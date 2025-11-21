@@ -119,7 +119,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
   return (
     <div className="mb-8 space-y-6">
       {/* Semester Selector */}
-      <div className="flex items-center gap-3 justify-between">
+      <div className="flex items-center gap-3 justify-between flex-wrap">
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
           <TrendingUp className="w-4 h-4" /> Thống kê
         </h3>
@@ -139,30 +139,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-indigo-500 dark:bg-indigo-600 text-white p-4 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="bg-indigo-500 dark:bg-indigo-600 text-white p-3 sm:p-4 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
             <div className="flex items-center gap-2 opacity-80 mb-1">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase">Trung bình</span>
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-[10px] sm:text-xs font-medium uppercase">Trung bình</span>
             </div>
-            <div className="text-2xl font-bold flex items-baseline">
+            <div className="text-xl sm:text-2xl font-bold flex items-baseline">
                 {stats.average.toFixed(rounding)}
-                <span className="text-xs opacity-70 ml-0.5 font-normal">/{defaultMaxScore}</span>
+                <span className="text-[10px] sm:text-xs opacity-70 ml-0.5 font-normal">/{defaultMaxScore}</span>
             </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-1">
-                <BookOpen className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase">Số lượng</span>
+                <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-[10px] sm:text-xs font-medium uppercase">Số lượng</span>
             </div>
-            <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.total}</div>
+            <div className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.total}</div>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-1">
-                <Award className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase">Môn học cao nhất</span>
+                <Award className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-[10px] sm:text-xs font-medium uppercase">Môn học cao nhất</span>
             </div>
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-100 truncate">{stats.bestSubject}</div>
+            <div className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate">{stats.bestSubject}</div>
         </div>
       </div>
 
@@ -173,32 +173,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
         <div className="grid gap-6 md:grid-cols-1"> 
             {stats.subjectData.map((subject) => (
                 <div key={subject.name} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-                    <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
-                        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg">{subject.name}</h4>
-                        <div className="text-sm font-bold px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">{subject.name}</h4>
+                        <div className="text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                             {subject.average.toFixed(rounding)}
                             <span className="text-[10px] opacity-70 ml-0.5">/{defaultMaxScore}</span>
                         </div>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
+                        <table className="w-full text-xs sm:text-sm text-left">
+                            <thead className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
                                 <tr>
-                                    <th className="px-5 py-3 font-medium w-1/3">Loại bài kiểm tra</th>
-                                    <th className="px-5 py-3 font-medium w-1/3">Điểm số</th>
-                                    <th className="px-5 py-3 font-medium w-1/3 text-right">Ngày</th>
+                                    <th className="px-3 sm:px-5 py-2 sm:py-3 font-medium w-1/3">Loại bài kiểm tra</th>
+                                    <th className="px-3 sm:px-5 py-2 sm:py-3 font-medium w-1/3">Điểm số</th>
+                                    <th className="px-3 sm:px-5 py-2 sm:py-3 font-medium w-1/3 text-right">Ngày</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {subject.entries.map((entry) => (
                                     <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                        <td className="px-5 py-3 text-slate-700 dark:text-slate-300">
+                                        <td className="px-3 sm:px-5 py-2 sm:py-3 text-slate-700 dark:text-slate-300">
                                             {entry.examType}
                                         </td>
-                                        <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-200">
-                                            {entry.score} <span className="text-slate-400 text-xs font-normal">/{entry.maxScore}</span>
+                                        <td className="px-3 sm:px-5 py-2 sm:py-3 font-medium text-slate-800 dark:text-slate-200">
+                                            {entry.score} <span className="text-slate-400 text-[10px] sm:text-xs font-normal">/{entry.maxScore}</span>
                                         </td>
-                                        <td className="px-5 py-3 text-right text-slate-500 dark:text-slate-500 whitespace-nowrap">
+                                        <td className="px-3 sm:px-5 py-2 sm:py-3 text-right text-slate-500 dark:text-slate-500 whitespace-nowrap">
                                             {new Date(entry.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                         </td>
                                     </tr>
