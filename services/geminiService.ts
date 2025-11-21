@@ -69,6 +69,84 @@ export const parseScoreFromText = async (
   }
 };
 
+// New function to parse multiple scores from a single input
+export const parseBulkScoresFromText = async (
+  text: string, 
+  defaultMaxScore: number, 
+  availableExamTypes: string[],
+  customSubjects: string[] = []
+): Promise<Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'>[]> => {
+  try {
+    // Ensure we have at least 'Other' if the list is somehow empty
+    const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
+
+    // Build subject instruction
+    let subjectInstruction = 'Tự động chuẩn hóa tên môn học';
+    if (customSubjects.length > 0) {
+      subjectInstruction = `Tên môn học phải khớp CHÍNH XÁC với một trong các môn sau: ${customSubjects.join(', ')}.
+      Chuẩn hóa từ viết tắt hoặc tên không chính thức (ví dụ: "lý" -> "Vật lý", "anh" -> "Tiếng Anh", "văn" -> "Ngữ văn", "toán" -> "Toán").
+      Nếu không chắc chắn, chọn môn gần nhất trong danh sách.`;
+    }
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `Trích xuất TẤT CẢ thông tin điểm học tập từ văn bản này: "${text}".
+      Văn bản này có thể chứa NHIỀU môn học và điểm số khác nhau.
+      
+      Ví dụ: "Have physics 10 and math 8 in mid-semester" nên trích xuất thành:
+      - Physics: điểm 10, loại bài kiểm tra "Giữa học kỳ"
+      - Math: điểm 8, loại bài kiểm tra "Giữa học kỳ"
+      
+      Với mỗi môn học được đề cập:
+      1. ${subjectInstruction}
+      2. Nếu không có thông tin điểm số tối đa, suy đoán ${defaultMaxScore} trừ khi ngữ cảnh rõ ràng chỉ ra khác.
+      3. Phân loại loại bài kiểm tra vào đúng một trong các loại sau: ${examTypes.join(', ')}. Chọn loại phù hợp nhất với ngữ cảnh. Nếu không chắc chắn, sử dụng "Khác".
+      4. Nếu có nhiều môn học dùng chung một loại bài kiểm tra, áp dụng cùng loại cho tất cả.
+      
+      Trả về một MẢNG các điểm số, mỗi phần tử là một môn học riêng biệt.
+      `,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              subject: {
+                type: Type.STRING,
+                description: "Tên môn học",
+              },
+              examType: {
+                type: Type.STRING,
+                description: "Loại bài kiểm tra",
+                enum: examTypes
+              },
+              score: {
+                type: Type.NUMBER,
+                description: "Điểm số đạt được",
+              },
+              maxScore: {
+                type: Type.NUMBER,
+                description: "Điểm số tối đa",
+              },
+            },
+            required: ["subject", "examType", "score", "maxScore"],
+          }
+        },
+      },
+    });
+
+    if (response.text) {
+      const data = JSON.parse(response.text);
+      return data as Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'>[];
+    }
+    return [];
+  } catch (error) {
+    console.error("Error parsing bulk scores with Gemini:", error);
+    throw new Error("Failed to interpret the scores. Please try again with a clearer sentence.");
+  }
+};
+
 export const parseScoresFromImage = async (
   base64Data: string,
   mimeType: string,
