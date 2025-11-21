@@ -40,6 +40,12 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({ score: '', max: '' });
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Swipe gesture state
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const percentage = (entry.score / entry.maxScore) * 100;
   const colorClass = getScoreColor(percentage);
@@ -103,9 +109,60 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
     }
   };
 
+  // Swipe gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isSelectMode || isEditing) return;
+    setTouchStartX(e.touches[0].clientX);
+    setIsSwiping(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isSelectMode || isEditing || touchStartX === null) return;
+    const currentX = e.touches[0].clientX;
+    setTouchCurrentX(currentX);
+  };
+
+  const handleTouchEnd = () => {
+    if (isSelectMode || isEditing || touchStartX === null) {
+      setTouchStartX(null);
+      setTouchCurrentX(null);
+      setIsSwiping(false);
+      return;
+    }
+
+    const swipeDistance = touchStartX - (touchCurrentX || touchStartX);
+    const SWIPE_THRESHOLD = 100; // pixels
+    
+    if (swipeDistance > SWIPE_THRESHOLD) {
+      // Swiped left - delete
+      onDelete(entry.id);
+    }
+    
+    // Reset swipe state
+    setTouchStartX(null);
+    setTouchCurrentX(null);
+    setIsSwiping(false);
+  };
+
+  // Calculate swipe offset for visual feedback
+  const getSwipeOffset = () => {
+    if (!isSwiping || touchStartX === null || touchCurrentX === null) return 0;
+    const offset = touchCurrentX - touchStartX;
+    // Only allow left swipe (negative offset), limit to -150px
+    return Math.max(Math.min(offset, 0), -150);
+  };
+
   return (
     <div 
+      ref={cardRef}
       onClick={handleCardClick}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{
+        transform: `translateX(${getSwipeOffset()}px)`,
+        transition: isSwiping ? 'none' : 'transform 0.3s ease-out'
+      }}
       className={`bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 shadow-sm border transition-all hover:shadow-md flex items-center justify-between gap-2 sm:gap-4 group break-inside-avoid ${
         isSelectMode ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''
       } ${
