@@ -275,7 +275,35 @@ function App() {
         // Scroll to top of list smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        setError("Could not understand the score. Try 'Subject score was X/Y' or 'Have Physics 10 and Math 8 in mid-semester'");
+        // Fallback: try single score parsing for backward compatibility
+        const singleResult = await parseScoreFromText(input, settings.defaultMaxScore, availableFactors, settings.customSubjects);
+        
+        if (singleResult) {
+          const newEntry: ScoreEntry = {
+            ...singleResult,
+            id: crypto.randomUUID(),
+            timestamp: Date.now(),
+            originalText: input
+          };
+          
+          // Save to Supabase
+          const scoreData = scoreEntryToScore(newEntry);
+          const savedScore = await addScore(scoreData);
+          
+          if (savedScore) {
+            const entryWithDbId = scoreToScoreEntry(savedScore);
+            setScores(prev => [entryWithDbId, ...prev]);
+          } else {
+            // Fallback: save locally even if Supabase fails
+            setScores(prev => [newEntry, ...prev]);
+          }
+          
+          setInput('');
+          // Scroll to top of list smoothly
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          setError("Could not understand the score. Try 'Subject score was X/Y' or 'Have Physics 10 and Math 8 in mid-semester'");
+        }
       }
     } catch (err) {
       setError("Something went wrong. Please check your connection.");

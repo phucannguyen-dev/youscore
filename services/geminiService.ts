@@ -137,8 +137,14 @@ export const parseBulkScoresFromText = async (
     });
 
     if (response.text) {
-      const data = JSON.parse(response.text);
-      return data as Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'>[];
+      try {
+        const data = JSON.parse(response.text);
+        return data as Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'>[];
+      } catch (parseError) {
+        console.error("Error parsing JSON response from Gemini:", parseError);
+        console.error("Response text:", response.text);
+        return [];
+      }
     }
     return [];
   } catch (error) {
