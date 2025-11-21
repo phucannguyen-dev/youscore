@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { Language } from '../types';
 import { useTranslation } from '../lib/translations';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface AuthProps {
   onSignIn: (email: string, password: string, language: Language) => Promise<void>;
@@ -39,26 +38,71 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 flex items-center justify-center px-4 transition-colors duration-300">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-background flex transition-colors duration-300">
+      {/* Left Panel - Testimonial Section */}
+      <div className="hidden lg:flex lg:w-1/2 bg-slate-900 dark:bg-slate-950 relative flex-col justify-end p-12">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
+        <div className="relative z-10 text-white">
+          <blockquote className="space-y-2">
+            <p className="text-lg md:text-xl font-medium leading-relaxed">
+              "Web hay, phù hợp để ghi lại điểm số, quá tuyệt vời :D"
+            </p>
+            <footer className="text-sm text-slate-400">
+              - Nhân
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+
+      {/* Right Panel - Form Section */}
+      <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-primary p-3 rounded-2xl shadow-lg">
-              <LogIn className="w-8 h-8 text-primary-foreground" />
-            </div>
+        <div className="flex items-center justify-between p-6 md:p-8">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">YouScore</h1>
           </div>
-          <h2 className="text-3xl font-bold text-foreground">
-            {isSignUp ? t.signUp : t.signIn}
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {isSignUp ? t.createAccountToSave : t.signInToAccess}
-          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setEmail('');
+              setPassword('');
+              setLocalMessage(null);
+            }}
+            disabled={isLoading}
+            className="text-sm"
+          >
+            {isSignUp ? (
+              <>Đăng nhập / <span className="text-muted-foreground">Login</span></>
+            ) : (
+              <>Đăng ký / <span className="text-muted-foreground">Sign up</span></>
+            )}
+          </Button>
         </div>
 
-        {/* Auth Form */}
-        <Card>
-          <CardHeader className="space-y-1">
+        {/* Form Content */}
+        <div className="flex-1 flex items-center justify-center px-6 md:px-8 py-12">
+          <div className="w-full max-w-sm space-y-6">
+            {/* Form Title */}
+            <div className="space-y-2">
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+                {isSignUp ? (
+                  <>Tạo tài khoản / <span className="text-muted-foreground">Create an account</span></>
+                ) : (
+                  <>Đăng nhập / <span className="text-muted-foreground">Sign in</span></>
+                )}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {isSignUp ? (
+                  <>Nhập email của bạn để tạo tài khoản / <span className="block sm:inline">Enter your email below to create your account</span></>
+                ) : (
+                  <>Nhập email và mật khẩu để đăng nhập / <span className="block sm:inline">Enter your email and password to sign in</span></>
+                )}
+              </p>
+            </div>
+
+            {/* Messages */}
             {displayMessage && (
               <div className={`p-3 rounded-lg flex items-center gap-2 text-sm ${
                 displayMessage.type === 'error' 
@@ -73,93 +117,70 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
                 <span>{displayMessage.text}</span>
               </div>
             )}
-          </CardHeader>
-          <CardContent>
+
+            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Input */}
               <div className="space-y-2">
-                <Label htmlFor="email">{t.email}</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    className="pl-10"
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  disabled={isLoading}
+                  required
+                  className="h-10"
+                />
               </div>
 
               {/* Password Input */}
               <div className="space-y-2">
-                <Label htmlFor="password">{t.password}</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="pl-10"
-                    disabled={isLoading}
-                    required
-                    minLength={6}
-                  />
-                </div>
-                {isSignUp && (
-                  <p className="text-xs text-muted-foreground">
-                    {t.passwordMinLength}
-                  </p>
-                )}
+                <Label htmlFor="password" className="text-sm font-medium">
+                  {isSignUp ? (
+                    <>Mật khẩu / <span className="text-muted-foreground">Password</span></>
+                  ) : (
+                    <>Mật khẩu / <span className="text-muted-foreground">Password</span></>
+                  )}
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                  required
+                  minLength={6}
+                  className="h-10"
+                />
               </div>
 
               {/* Submit Button */}
               <Button
                 type="submit"
                 disabled={isLoading || !email.trim() || !password.trim()}
-                className="w-full"
-                size="lg"
+                className="w-full h-11"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : isSignUp ? (
+                  <>Đăng ký bằng email / Sign up with Email</>
                 ) : (
-                  <>
-                    {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
-                    {isSignUp ? t.signUp : t.signIn}
-                  </>
+                  <>Đăng nhập bằng email / Sign in with Email</>
                 )}
               </Button>
             </form>
 
-            {/* Toggle Sign Up/Sign In */}
-            <div className="mt-6 text-center">
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setEmail('');
-                  setPassword('');
-                  setLocalMessage(null);
-                }}
-                disabled={isLoading}
-                className="text-sm"
-              >
-                {isSignUp ? t.alreadyHaveAccount : t.dontHaveAccount}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Footer Note */}
-        <p className="text-center text-xs text-muted-foreground">
-          {t.dataSecure}
-        </p>
+            {/* Footer Note */}
+            <p className="text-center text-xs text-muted-foreground">
+              Dữ liệu của bạn được bảo mật và lưu trữ an toàn /<br className="sm:hidden" /> Your data is secure and stored safely
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
