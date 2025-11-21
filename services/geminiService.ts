@@ -3,6 +3,30 @@ import { ScoreEntry } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+// Helper function to build subject instruction for AI
+const buildSubjectInstruction = (customSubjects: string[]): string => {
+  if (customSubjects.length === 0) {
+    return 'Tự động chuẩn hóa tên môn học';
+  }
+  
+  return `BẮT BUỘC: Tên môn học phải CHÍNH XÁC khớp với MỘT trong các môn sau (không được tạo môn mới): ${customSubjects.join(', ')}.
+  
+  Quy tắc chuẩn hóa:
+  - "lý" hoặc "ly" -> "Vật lý"
+  - "anh" hoặc "tieng anh" hoặc "ta" -> "Tiếng Anh"
+  - "văn" hoặc "van" hoặc "ngu van" -> "Ngữ văn"
+  - "toán" hoặc "toan" -> "Toán"
+  - "hóa" hoặc "hoa" hoặc "hoa hoc" -> "Hóa học"
+  - "sinh" hoặc "sinh hoc" -> "Sinh học"
+  - "sử" hoặc "su" hoặc "lich su" -> "Lịch sử"
+  - "địa" hoặc "dia" hoặc "dia ly" -> "Địa lý"
+  - "gdcd" -> "Giáo dục công dân"
+  - "tin" hoặc "tin hoc" -> "Tin học"
+  - "cn" hoặc "cong nghe" -> "Công nghệ"
+  
+  Nếu không khớp chính xác với bất kỳ môn nào, chọn môn gần nghĩa nhất trong danh sách.`;
+};
+
 export const parseScoreFromText = async (
   text: string, 
   defaultMaxScore: number, 
@@ -13,13 +37,8 @@ export const parseScoreFromText = async (
     // Ensure we have at least 'Other' if the list is somehow empty
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
 
-    // Build subject instruction
-    let subjectInstruction = 'Tự động chuẩn hóa tên môn học';
-    if (customSubjects.length > 0) {
-      subjectInstruction = `Tên môn học phải khớp CHÍNH XÁC với một trong các môn sau: ${customSubjects.join(', ')}.
-      Chuẩn hóa từ viết tắt hoặc tên không chính thức (ví dụ: "lý" -> "Vật lý", "anh" -> "Tiếng Anh", "văn" -> "Ngữ văn", "toán" -> "Toán").
-      Nếu không chắc chắn, chọn môn gần nhất trong danh sách.`;
-    }
+    // Build subject instruction using helper function
+    const subjectInstruction = buildSubjectInstruction(customSubjects);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -80,13 +99,8 @@ export const parseBulkScoresFromText = async (
     // Ensure we have at least 'Other' if the list is somehow empty
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
 
-    // Build subject instruction
-    let subjectInstruction = 'Tự động chuẩn hóa tên môn học';
-    if (customSubjects.length > 0) {
-      subjectInstruction = `Tên môn học phải khớp CHÍNH XÁC với một trong các môn sau: ${customSubjects.join(', ')}.
-      Chuẩn hóa từ viết tắt hoặc tên không chính thức (ví dụ: "lý" -> "Vật lý", "anh" -> "Tiếng Anh", "văn" -> "Ngữ văn", "toán" -> "Toán").
-      Nếu không chắc chắn, chọn môn gần nhất trong danh sách.`;
-    }
+    // Build subject instruction using helper function
+    const subjectInstruction = buildSubjectInstruction(customSubjects);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -163,11 +177,8 @@ export const parseScoresFromImage = async (
   try {
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
 
-    // Build subject instruction
-    let subjectInstruction = 'chuẩn hóa tên môn học (ví dụ, "lý" -> "Vật lý")';
-    if (customSubjects.length > 0) {
-      subjectInstruction = `tên môn học phải khớp CHÍNH XÁC với một trong: ${customSubjects.join(', ')}. Chuẩn hóa từ viết tắt (ví dụ: "lý" -> "Vật lý", "anh" -> "Tiếng Anh")`;
-    }
+    // Build subject instruction using helper function
+    const subjectInstruction = buildSubjectInstruction(customSubjects);
 
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-preview",

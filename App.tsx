@@ -226,7 +226,17 @@ function App() {
       
       const userSettings = await getUserSettings();
       if (userSettings) {
-        setSettings(userSettings);
+        // Ensure default subjects are included if customSubjects is empty or missing
+        const mergedSettings = {
+          ...userSettings,
+          customSubjects: (userSettings.customSubjects && userSettings.customSubjects.length > 0) 
+            ? userSettings.customSubjects 
+            : DEFAULT_SUBJECTS,
+          customFactors: (userSettings.customFactors && userSettings.customFactors.length > 0)
+            ? userSettings.customFactors
+            : DEFAULT_FACTORS
+        };
+        setSettings(mergedSettings);
       }
     };
     
@@ -728,6 +738,7 @@ function App() {
                         rounding={settings.rounding}
                         showDate={settings.showDates}
                         availableTypes={availableFactors}
+                        availableSubjects={settings.customSubjects || DEFAULT_SUBJECTS}
                         onUpdate={handleUpdateScore}
                         isSelectMode={isSelectMode}
                         isSelected={selectedIds.has(score.id)}
