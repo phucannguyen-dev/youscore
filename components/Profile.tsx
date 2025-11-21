@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, UserCircle, Lock, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, UserCircle, Lock, Trash2, LogOut } from 'lucide-react';
 import { getUserProfile, upsertUserProfile, updatePassword, deleteAccount, UserProfile, getCurrentUser } from '../lib/supabase';
 import { AppSettings } from '../types';
 
 interface ProfileProps {
   onBack: () => void;
   onAccountDeleted: () => void;
+  onSignOut: () => void;
 }
 
 export const Profile: React.FC<ProfileProps> = ({ 
   onBack, 
-  onAccountDeleted
+  onAccountDeleted,
+  onSignOut
 }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
@@ -228,6 +230,19 @@ export const Profile: React.FC<ProfileProps> = ({
           >
             <Lock className="w-4 h-4" />
             Thay đổi mật khẩu
+          </button>
+        </div>
+      </section>
+
+      {/* Sign Out */}
+      <section className="space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+          <button 
+            onClick={onSignOut}
+            className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+          >
+            <LogOut className="w-4 h-4" />
+            Đăng xuất
           </button>
         </div>
       </section>

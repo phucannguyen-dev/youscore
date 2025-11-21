@@ -10,9 +10,10 @@ interface DashboardProps {
   defaultMaxScore: number;
   semestersPerYear: number;
   semesterDurations?: SemesterDuration[];
+  searchQuery?: string;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, rounding, customFactors, defaultMaxScore, semestersPerYear, semesterDurations }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, rounding, customFactors, defaultMaxScore, semestersPerYear, semesterDurations, searchQuery }) => {
   const [selectedSemester, setSelectedSemester] = useState<'all' | number>('all');
   
   // Calculate semester for each score based on timestamp
