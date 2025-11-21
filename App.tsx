@@ -676,6 +676,46 @@ function App() {
               </div>
             )}
 
+            {/* Quick Navigation - Anchor Links */}
+            {scores.length > 0 && (
+              <div className="mb-6 print:hidden">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <a 
+                    href="#summary" 
+                    className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  >
+                    Thống kê
+                  </a>
+                  <span className="text-slate-300 dark:text-slate-700">•</span>
+                  <a 
+                    href="#score-groups" 
+                    className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('score-groups')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  >
+                    Tổng hợp
+                  </a>
+                  <span className="text-slate-300 dark:text-slate-700">•</span>
+                  <a 
+                    href="#history" 
+                    className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('history')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  >
+                    Lịch sử
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Desktop: Two-column layout, Mobile: Single column */}
             <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
               {/* Left Column: Dashboard (Summary & Subject Groups) */}
@@ -693,7 +733,7 @@ function App() {
               </div>
 
               {/* Right Column: History (Score List) */}
-              <div>
+              <div id="history" className="scroll-mt-20">
                 
                 {/* Recent List Header */}
                 {scores.length > 0 && (
