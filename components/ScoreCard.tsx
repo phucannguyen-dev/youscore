@@ -87,7 +87,6 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   useEffect(() => {
       if (isEditingSubject && subjectInputRef.current) {
           subjectInputRef.current.focus();
-          subjectInputRef.current.select();
       }
   }, [isEditingSubject]);
 
