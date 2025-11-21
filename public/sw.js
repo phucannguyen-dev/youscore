@@ -2,6 +2,14 @@
 const CACHE_NAME = 'youscore-v1';
 const RUNTIME_CACHE = 'youscore-runtime-v1';
 
+// Hostnames for API requests that should use network-first strategy
+const API_HOSTNAMES = [
+  'supabase.co',
+  'generativelanguage.googleapis.com',  // Gemini AI API
+  'aistudiocdn.com',  // CDN for dependencies
+  'vercel.com'
+];
+
 // Assets to cache on install
 const PRECACHE_URLS = [
   '/',
@@ -63,17 +71,12 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For API requests (Supabase, external APIs), use network-first strategy
-  if (url.pathname.includes('/api/') || 
-      url.hostname === 'supabase.co' ||
-      url.hostname.endsWith('.supabase.co') ||
-      url.hostname === 'google.com' ||
-      url.hostname.endsWith('.google.com') ||
-      url.hostname === 'googleapis.com' ||
-      url.hostname.endsWith('.googleapis.com') ||
-      url.hostname === 'vercel.com' ||
-      url.hostname.endsWith('.vercel.com') ||
-      url.hostname === 'aistudiocdn.com' ||
-      url.hostname.endsWith('.aistudiocdn.com')) {
+  const isApiRequest = url.pathname.includes('/api/') || 
+    API_HOSTNAMES.some(hostname => 
+      url.hostname === hostname || url.hostname.endsWith('.' + hostname)
+    );
+  
+  if (isApiRequest) {
     event.respondWith(
       fetch(request)
         .catch(() => {
