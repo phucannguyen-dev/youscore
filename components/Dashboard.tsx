@@ -46,8 +46,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
         }
       } else {
         // Fallback to simple logic (assuming Vietnamese school year: Sept-June)
+        // Note: July and August are summer break, defaulting to semester 2
         if (semestersPerYear === 2) {
-          // Semester 1: Sept-Dec (9-12), Semester 2: Jan-June (1-6)
+          // Semester 1: Sept-Dec (9-12), Semester 2: Jan-Aug (1-8, includes summer)
           semester = (month >= 9 && month <= 12) ? 1 : 2;
         } else if (semestersPerYear === 3) {
           // Semester 1: Sept-Dec, Semester 2: Jan-Apr, Semester 3: May-Aug

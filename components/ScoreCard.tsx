@@ -45,7 +45,10 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
   const [isSwiping, setIsSwiping] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  
+  // Swipe gesture constants
+  const SWIPE_THRESHOLD = 100; // pixels
+  const MAX_SWIPE_DISTANCE = 150; // pixels
 
   const percentage = (entry.score / entry.maxScore) * 100;
   const colorClass = getScoreColor(percentage);
@@ -119,10 +122,17 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const handleTouchMove = (e: React.TouchEvent) => {
     if (isSelectMode || isEditing || touchStartX === null) return;
     const currentX = e.touches[0].clientX;
+    const swipeDistance = touchStartX - currentX;
+    
+    // Only prevent default if user is swiping left (to avoid interfering with scroll)
+    if (swipeDistance > 0) {
+      e.preventDefault();
+    }
+    
     setTouchCurrentX(currentX);
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (isSelectMode || isEditing || touchStartX === null) {
       setTouchStartX(null);
       setTouchCurrentX(null);
@@ -131,10 +141,10 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
     }
 
     const swipeDistance = touchStartX - (touchCurrentX || touchStartX);
-    const SWIPE_THRESHOLD = 100; // pixels
     
     if (swipeDistance > SWIPE_THRESHOLD) {
       // Swiped left - delete
+      e.stopPropagation();
       onDelete(entry.id);
     }
     
@@ -148,13 +158,12 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const getSwipeOffset = () => {
     if (!isSwiping || touchStartX === null || touchCurrentX === null) return 0;
     const offset = touchCurrentX - touchStartX;
-    // Only allow left swipe (negative offset), limit to -150px
-    return Math.max(Math.min(offset, 0), -150);
+    // Only allow left swipe (negative offset), limit to -MAX_SWIPE_DISTANCE
+    return Math.max(Math.min(offset, 0), -MAX_SWIPE_DISTANCE);
   };
 
   return (
     <div 
-      ref={cardRef}
       onClick={handleCardClick}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
