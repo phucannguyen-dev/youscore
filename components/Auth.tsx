@@ -45,7 +45,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
         <div className="relative z-10 text-white">
           <blockquote className="space-y-2">
             <p className="text-lg md:text-xl font-medium leading-relaxed">
-              "Web hay, phù hợp để ghi lại điểm số, quá tuyệt vời!"
+              "Web hay, phù hợp để ghi lại điểm số, quá tuyệt!"
             </p>
             <footer className="text-sm text-slate-400">
               - Thành Nhân
