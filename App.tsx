@@ -579,6 +579,35 @@ function App() {
               </div>
             )}
 
+            {/* Search Bar - Now above the two-column layout */}
+            {scores.length > 0 && (
+              <div className="mb-6 print:hidden">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
+                    className="w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm rounded-lg py-2.5 pl-10 pr-10 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 px-1">
+                    Tìm thấy {filteredScores.length} kết quả
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Desktop: Two-column layout, Mobile: Single column */}
             <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
               {/* Left Column: Dashboard (Summary & Subject Groups) */}
@@ -597,34 +626,6 @@ function App() {
 
               {/* Right Column: History (Score List) */}
               <div>
-                {/* Search Bar */}
-                {scores.length > 0 && (
-                  <div className="mb-4 print:hidden">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
-                        className="w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm rounded-lg py-2.5 pl-10 pr-10 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                    {searchQuery && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 px-1">
-                        Tìm thấy {filteredScores.length} kết quả
-                      </p>
-                    )}
-                  </div>
-                )}
                 
                 {/* Recent List Header */}
                 {scores.length > 0 && (
