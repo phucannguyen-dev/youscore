@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScoreEntry, CustomFactor } from '../types';
+import { ScoreEntry, CustomFactor, SemesterDuration } from '../types';
 import { TrendingUp, Award, BookOpen, Calendar } from 'lucide-react';
 
 interface DashboardProps {
@@ -9,9 +9,10 @@ interface DashboardProps {
   customFactors: CustomFactor[];
   defaultMaxScore: number;
   semestersPerYear: number;
+  semesterDurations?: SemesterDuration[];
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, rounding, customFactors, defaultMaxScore, semestersPerYear }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, rounding, customFactors, defaultMaxScore, semestersPerYear, semesterDurations }) => {
   const [selectedSemester, setSelectedSemester] = useState<'all' | number>('all');
   
   // Calculate semester for each score based on timestamp
@@ -20,24 +21,52 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
       const date = new Date(score.timestamp);
       const month = date.getMonth() + 1; // 1-12
       
-      // Determine semester based on month and semestersPerYear
+      // Determine semester based on month and semesterDurations if available
       let semester = 1;
-      if (semestersPerYear === 2) {
-        semester = month <= 6 ? 1 : 2;
-      } else if (semestersPerYear === 3) {
-        if (month <= 4) semester = 1;
-        else if (month <= 8) semester = 2;
-        else semester = 3;
-      } else if (semestersPerYear === 4) {
-        if (month <= 3) semester = 1;
-        else if (month <= 6) semester = 2;
-        else if (month <= 9) semester = 3;
-        else semester = 4;
+      
+      if (semesterDurations && semesterDurations.length > 0) {
+        // Use custom semester durations from settings
+        for (let i = 0; i < semesterDurations.length; i++) {
+          const duration = semesterDurations[i];
+          
+          // Handle semester that spans across year boundary (e.g., Sept-Dec or Dec-Feb)
+          if (duration.startMonth <= duration.endMonth) {
+            // Normal range within same year (e.g., 1-6, 9-12)
+            if (month >= duration.startMonth && month <= duration.endMonth) {
+              semester = i + 1;
+              break;
+            }
+          } else {
+            // Range that crosses year boundary (e.g., 9-6 means Sept-June next year)
+            if (month >= duration.startMonth || month <= duration.endMonth) {
+              semester = i + 1;
+              break;
+            }
+          }
+        }
+      } else {
+        // Fallback to simple logic (assuming Vietnamese school year: Sept-June)
+        // Note: July and August are summer break, defaulting to semester 2
+        if (semestersPerYear === 2) {
+          // Semester 1: Sept-Dec (9-12), Semester 2: Jan-Aug (1-8, includes summer)
+          semester = (month >= 9 && month <= 12) ? 1 : 2;
+        } else if (semestersPerYear === 3) {
+          // Semester 1: Sept-Dec, Semester 2: Jan-Apr, Semester 3: May-Aug
+          if (month >= 9 && month <= 12) semester = 1;
+          else if (month >= 1 && month <= 4) semester = 2;
+          else semester = 3;
+        } else if (semestersPerYear === 4) {
+          // Semester 1: Sept-Nov, Semester 2: Dec-Feb, Semester 3: Mar-May, Semester 4: Jun-Aug
+          if (month >= 9 && month <= 11) semester = 1;
+          else if (month === 12 || (month >= 1 && month <= 2)) semester = 2;
+          else if (month >= 3 && month <= 5) semester = 3;
+          else semester = 4;
+        }
       }
       
       return { ...score, semester };
     });
-  }, [scores, semestersPerYear]);
+  }, [scores, semestersPerYear, semesterDurations]);
 
   // Filter scores by selected semester
   const filteredScores = useMemo(() => {

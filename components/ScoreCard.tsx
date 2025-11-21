@@ -40,6 +40,15 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({ score: '', max: '' });
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Swipe gesture state
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
+  const [isSwiping, setIsSwiping] = useState(false);
+  
+  // Swipe gesture constants
+  const SWIPE_THRESHOLD = 100; // pixels
+  const MAX_SWIPE_DISTANCE = 150; // pixels
 
   const percentage = (entry.score / entry.maxScore) * 100;
   const colorClass = getScoreColor(percentage);
@@ -103,9 +112,66 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
     }
   };
 
+  // Swipe gesture handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isSelectMode || isEditing) return;
+    setTouchStartX(e.touches[0].clientX);
+    setIsSwiping(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isSelectMode || isEditing || touchStartX === null) return;
+    const currentX = e.touches[0].clientX;
+    const swipeDistance = touchStartX - currentX;
+    
+    // Only prevent default if user is swiping left (to avoid interfering with scroll)
+    if (swipeDistance > 0) {
+      e.preventDefault();
+    }
+    
+    setTouchCurrentX(currentX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isSelectMode || isEditing || touchStartX === null) {
+      setTouchStartX(null);
+      setTouchCurrentX(null);
+      setIsSwiping(false);
+      return;
+    }
+
+    const swipeDistance = touchStartX - (touchCurrentX || touchStartX);
+    
+    if (swipeDistance > SWIPE_THRESHOLD) {
+      // Swiped left - delete
+      e.stopPropagation();
+      onDelete(entry.id);
+    }
+    
+    // Reset swipe state
+    setTouchStartX(null);
+    setTouchCurrentX(null);
+    setIsSwiping(false);
+  };
+
+  // Calculate swipe offset for visual feedback
+  const getSwipeOffset = () => {
+    if (!isSwiping || touchStartX === null || touchCurrentX === null) return 0;
+    const offset = touchCurrentX - touchStartX;
+    // Only allow left swipe (negative offset), limit to -MAX_SWIPE_DISTANCE
+    return Math.max(Math.min(offset, 0), -MAX_SWIPE_DISTANCE);
+  };
+
   return (
     <div 
       onClick={handleCardClick}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{
+        transform: `translateX(${getSwipeOffset()}px)`,
+        transition: isSwiping ? 'none' : 'transform 0.3s ease-out'
+      }}
       className={`bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 shadow-sm border transition-all hover:shadow-md flex items-center justify-between gap-2 sm:gap-4 group break-inside-avoid ${
         isSelectMode ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''
       } ${

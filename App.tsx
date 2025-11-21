@@ -582,6 +582,7 @@ function App() {
                     customFactors={settings.customFactors}
                     defaultMaxScore={settings.defaultMaxScore}
                     semestersPerYear={settings.semestersPerYear}
+                    semesterDurations={settings.semesterDurations}
                 />
               </div>
 
@@ -670,7 +671,7 @@ function App() {
 
       {/* Input Area or Bulk Actions - Sticky Bottom (Only on Home) */}
       {currentView === 'home' && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 z-20 transition-colors print:hidden">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 pb-6 md:pb-4 z-20 transition-colors print:hidden">
            <div className="mx-auto relative lg:max-w-7xl md:max-w-4xl max-w-2xl">
               {error && !isSelectMode && (
                   <div className="absolute -top-16 left-0 right-0 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-xs py-2 px-3 rounded-lg border border-red-100 dark:border-red-800 text-center mb-2">
