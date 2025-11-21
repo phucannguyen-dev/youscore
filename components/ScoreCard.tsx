@@ -8,6 +8,7 @@ interface ScoreCardProps {
   rounding: number;
   showDate: boolean;
   availableTypes: string[];
+  availableSubjects: string[];
   onUpdate: (id: string, updates: Partial<ScoreEntry>) => void;
   isSelectMode?: boolean;
   isSelected?: boolean;
@@ -31,7 +32,8 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   onDelete, 
   rounding, 
   showDate, 
-  availableTypes, 
+  availableTypes,
+  availableSubjects,
   onUpdate,
   isSelectMode = false,
   isSelected = false,
@@ -42,7 +44,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const [isEditingSubject, setIsEditingSubject] = useState(false);
   const [editSubject, setEditSubject] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const subjectInputRef = useRef<HTMLInputElement>(null);
+  const subjectInputRef = useRef<HTMLSelectElement>(null);
   
   // Swipe gesture state
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -277,17 +279,20 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
           </div>
         </div>
         
-        {/* Subject - Now Editable */}
+        {/* Subject - Now Editable with Dropdown */}
         {isEditingSubject ? (
           <div className="flex items-center gap-2 mb-1" onClick={e => e.stopPropagation()}>
-            <input 
+            <select 
               ref={subjectInputRef}
-              type="text" 
               value={editSubject}
               onChange={e => setEditSubject(e.target.value)}
               onKeyDown={handleSubjectKeyDown}
-              className="flex-1 text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border-b-2 border-indigo-500 focus:outline-none px-1 py-0.5"
-            />
+              className="flex-1 text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border-b-2 border-indigo-500 focus:outline-none px-1 py-0.5 cursor-pointer"
+            >
+              {availableSubjects.map(subject => (
+                <option key={subject} value={subject}>{subject}</option>
+              ))}
+            </select>
             <button onClick={saveSubjectEdit} className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded">
               <Check className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
