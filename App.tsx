@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut, User as UserIcon, Search, X } from 'lucide-react';
+import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, User as UserIcon, Search, X } from 'lucide-react';
 import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
 import { ScoreEntry, AppSettings, CustomFactor, Language } from './types';
 import { ScoreCard } from './components/ScoreCard';
@@ -584,7 +584,7 @@ function App() {
               {/* Left Column: Dashboard (Summary & Subject Groups) */}
               <div className="lg:sticky lg:top-20">
                 <Dashboard 
-                    scores={searchQuery ? filteredScores : scores}
+                    scores={filteredScores}
                     isDarkMode={isDarkMode} 
                     rounding={settings.rounding} 
                     customFactors={settings.customFactors}
