@@ -123,7 +123,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
         <div className="flex items-center justify-between mb-1 gap-2">
           <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
             <div className="relative group/badge">
-                <span className={`px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full uppercase tracking-wide flex items-center gap-1 cursor-pointer ${
+                <span className={`px-1.5 sm:px-2 py-0.5 text-xs font-semibold rounded-full uppercase tracking-wide flex items-center gap-1 cursor-pointer ${
                 entry.examType === ExamType.FINAL 
                     ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' 
                     : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -147,7 +147,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
 
             {showDate && (
               <div className="relative group/date">
-                  <span className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 flex items-center group-hover/date:text-indigo-500 dark:group-hover/date:text-indigo-400 transition-colors cursor-pointer">
+                  <span className="text-xs text-slate-400 dark:text-slate-500 flex items-center group-hover/date:text-indigo-500 dark:group-hover/date:text-indigo-400 transition-colors cursor-pointer" title={dateDisplay}>
                     <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                     {dateDisplay}
                   </span>
@@ -164,8 +164,8 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
             )}
           </div>
         </div>
-        <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate">{entry.subject}</h3>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 italic truncate print:hidden">"{entry.originalText}"</p>
+        <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate" title={entry.subject}>{entry.subject}</h3>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 italic truncate print:hidden" title={entry.originalText}>"{entry.originalText}"</p>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
@@ -206,9 +206,9 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
                 <div className="flex items-center font-bold text-base sm:text-lg">
                     {getIcon(percentage)}
                     {Number(entry.score.toFixed(rounding))}
-                    <span className="text-[10px] sm:text-xs opacity-70 font-normal ml-0.5">/{entry.maxScore}</span>
+                    <span className="text-xs opacity-70 font-normal ml-0.5">/{entry.maxScore}</span>
                 </div>
-                <span className="text-[8px] sm:text-[10px] font-semibold">{percentage.toFixed(0)}%</span>
+                <span className="text-xs font-semibold">{percentage.toFixed(0)}%</span>
             </div>
         )}
 
