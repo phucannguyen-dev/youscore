@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { LogIn, UserPlus, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { Language } from '../types';
 import { useTranslation } from '../lib/translations';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface AuthProps {
   onSignIn: (email: string, password: string, language: Language) => Promise<void>;
@@ -40,119 +44,120 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg">
-              <LogIn className="w-8 h-8 text-white" />
+            <div className="bg-primary p-3 rounded-2xl shadow-lg">
+              <LogIn className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-foreground">
             {isSignUp ? t.signUp : t.signIn}
           </h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             {isSignUp ? t.createAccountToSave : t.signInToAccess}
           </p>
         </div>
 
         {/* Auth Form */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-800">
-          {displayMessage && (
-            <div className={`mb-4 p-3 rounded-lg flex items-center gap-2 text-sm ${
-              displayMessage.type === 'error' 
-                ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
-                : 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400'
-            }`}>
-              {displayMessage.type === 'error' ? (
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              ) : (
-                <CheckCircle className="w-4 h-4 flex-shrink-0" />
-              )}
-              <span>{displayMessage.text}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                {t.email}
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
-                  disabled={isLoading}
-                  required
-                />
+        <Card>
+          <CardHeader className="space-y-1">
+            {displayMessage && (
+              <div className={`p-3 rounded-lg flex items-center gap-2 text-sm ${
+                displayMessage.type === 'error' 
+                  ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
+                  : 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400'
+              }`}>
+                {displayMessage.type === 'error' ? (
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                ) : (
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                )}
+                <span>{displayMessage.text}</span>
               </div>
-            </div>
-
-            {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                {t.password}
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
-                  disabled={isLoading}
-                  required
-                  minLength={6}
-                />
+            )}
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email Input */}
+              <div className="space-y-2">
+                <Label htmlFor="email">{t.email}</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="pl-10"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
               </div>
-              {isSignUp && (
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  {t.passwordMinLength}
-                </p>
-              )}
+
+              {/* Password Input */}
+              <div className="space-y-2">
+                <Label htmlFor="password">{t.password}</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pl-10"
+                    disabled={isLoading}
+                    required
+                    minLength={6}
+                  />
+                </div>
+                {isSignUp && (
+                  <p className="text-xs text-muted-foreground">
+                    {t.passwordMinLength}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={isLoading || !email.trim() || !password.trim()}
+                className="w-full"
+                size="lg"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    {isSignUp ? <UserPlus className="w-5 h-5 mr-2" /> : <LogIn className="w-5 h-5 mr-2" />}
+                    {isSignUp ? t.signUp : t.signIn}
+                  </>
+                )}
+              </Button>
+            </form>
+
+            {/* Toggle Sign Up/Sign In */}
+            <div className="mt-6 text-center">
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setEmail('');
+                  setPassword('');
+                  setLocalMessage(null);
+                }}
+                disabled={isLoading}
+                className="text-sm"
+              >
+                {isSignUp ? t.alreadyHaveAccount : t.dontHaveAccount}
+              </Button>
             </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading || !email.trim() || !password.trim()}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  {isSignUp ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
-                  {isSignUp ? t.signUp : t.signIn}
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Toggle Sign Up/Sign In */}
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setEmail('');
-                setPassword('');
-                setLocalMessage(null);
-              }}
-              className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors"
-              disabled={isLoading}
-            >
-              {isSignUp ? t.alreadyHaveAccount : t.dontHaveAccount}
-            </button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Footer Note */}
-        <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-center text-xs text-muted-foreground">
           {t.dataSecure}
         </p>
       </div>

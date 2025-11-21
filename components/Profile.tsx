@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save, UserCircle, Lock, Trash2, LogOut } from 'lucide-react';
 import { getUserProfile, upsertUserProfile, updatePassword, deleteAccount, UserProfile, getCurrentUser } from '../lib/supabase';
 import { AppSettings } from '../types';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface ProfileProps {
   onBack: () => void;
@@ -123,14 +127,16 @@ export const Profile: React.FC<ProfileProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-20">
       <div className="flex items-center gap-4 mb-2">
-        <button 
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onBack}
-          className="p-2 -ml-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+          className="-ml-2"
           aria-label="Quay về"
         >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Hồ sơ cá nhân</h2>
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <h2 className="text-2xl font-bold text-foreground">Hồ sơ cá nhân</h2>
       </div>
 
       {/* Message Banner */}
@@ -151,92 +157,90 @@ export const Profile: React.FC<ProfileProps> = ({
         <div className="space-y-6">
           {/* User Information */}
           <section className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
               <UserCircle className="w-4 h-4" /> Thông tin cá nhân
             </h3>
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Email
-                </label>
-                <input 
-                  type="email"
-                  value={userEmail || 'Đang tải...'}
-                  disabled
-                  className="w-full p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
-                />
-                <p className="text-xs text-slate-500 mt-1">Email không thể thay đổi</p>
-              </div>
+            <Card>
+              <CardContent className="space-y-4 pt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={userEmail || 'Đang tải...'}
+                    disabled
+                    className="cursor-not-allowed"
+                  />
+                  <p className="text-xs text-muted-foreground">Email không thể thay đổi</p>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Tên hiển thị
-                </label>
-                <input 
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Nhập tên của bạn"
-                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Tên hiển thị</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Nhập tên của bạn"
+                  />
+                </div>
 
-              <button 
-                onClick={handleSaveProfile}
-                disabled={isSaving}
-                className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
-              >
-                {isSaving ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                {isSaving ? 'Đang lưu...' : 'Lưu thông tin'}
-              </button>
-            </div>
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  className="w-full"
+                >
+                  {isSaving ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  {isSaving ? 'Đang lưu...' : 'Lưu thông tin'}
+                </Button>
+              </CardContent>
+            </Card>
           </section>
 
           {/* Change Password */}
           <section className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
               <Lock className="w-4 h-4" /> Thay đổi mật khẩu
             </h3>
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Mật khẩu mới
-                </label>
-                <input 
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
+            <Card>
+              <CardContent className="space-y-4 pt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Mật khẩu mới</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Xác nhận mật khẩu mới
-                </label>
-                <input 
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Nhập lại mật khẩu mới"
-                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Nhập lại mật khẩu mới"
+                  />
+                </div>
 
-              <button 
-                onClick={handleChangePassword}
-                disabled={isSaving || !newPassword || !confirmPassword}
-                className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 disabled:bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-600 dark:disabled:bg-slate-800 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
-              >
-                <Lock className="w-4 h-4" />
-                Thay đổi mật khẩu
-              </button>
-            </div>
+                <Button
+                  variant="secondary"
+                  onClick={handleChangePassword}
+                  disabled={isSaving || !newPassword || !confirmPassword}
+                  className="w-full"
+                >
+                  <Lock className="w-4 h-4 mr-2" />
+                  Thay đổi mật khẩu
+                </Button>
+              </CardContent>
+            </Card>
           </section>
         </div>
 
@@ -244,15 +248,18 @@ export const Profile: React.FC<ProfileProps> = ({
         <div className="space-y-6 lg:mt-0 mt-6">
           {/* Sign Out */}
           <section className="space-y-4">
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
-              <button 
-                onClick={onSignOut}
-                className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
-              >
-                <LogOut className="w-4 h-4" />
-                Đăng xuất
-              </button>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <Button
+                  variant="secondary"
+                  onClick={onSignOut}
+                  className="w-full"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Đăng xuất
+                </Button>
+              </CardContent>
+            </Card>
           </section>
 
           {/* Delete Account */}
@@ -266,13 +273,14 @@ export const Profile: React.FC<ProfileProps> = ({
                   <p className="text-sm text-red-700 dark:text-red-300">
                     Xóa tài khoản của bạn và tất cả dữ liệu liên quan. Hành động này không thể hoàn tác.
                   </p>
-                  <button 
+                  <Button
+                    variant="destructive"
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                    className="w-full"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Xóa tài khoản
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
@@ -282,35 +290,37 @@ export const Profile: React.FC<ProfileProps> = ({
                   <p className="text-xs text-red-600 dark:text-red-400">
                     Nhập <strong>XÓA TÀI KHOẢN</strong> để xác nhận
                   </p>
-                  <input 
+                  <Input
                     type="text"
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                     placeholder="XÓA TÀI KHOẢN"
-                    className="w-full p-2.5 rounded-lg bg-white dark:bg-slate-800 border-2 border-red-300 dark:border-red-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                    className="border-2 border-red-300 dark:border-red-700 focus:ring-red-500 focus:border-red-500"
                   />
                   <div className="flex gap-2">
-                    <button 
+                    <Button
+                      variant="secondary"
                       onClick={() => {
                         setShowDeleteConfirm(false);
                         setDeleteConfirmText('');
                       }}
-                      className="flex-1 px-4 py-2.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium transition-colors"
+                      className="flex-1"
                     >
                       Hủy
-                    </button>
-                    <button 
+                    </Button>
+                    <Button
+                      variant="destructive"
                       onClick={handleDeleteAccount}
                       disabled={isDeleting || deleteConfirmText !== 'XÓA TÀI KHOẢN'}
-                      className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 dark:disabled:bg-red-900/50 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                      className="flex-1"
                     >
                       {isDeleting ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
                       ) : (
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 mr-2" />
                       )}
                       {isDeleting ? 'Đang xóa...' : 'Xác nhận xóa'}
-                    </button>
+                    </Button>
                   </div>
                 </>
               )}
