@@ -244,9 +244,6 @@ export const Profile: React.FC<ProfileProps> = ({
         <div className="space-y-6 lg:mt-0 mt-6">
           {/* Sign Out */}
           <section className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider opacity-0 pointer-events-none lg:block hidden">
-              &nbsp;
-            </h3>
             <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
               <button 
                 onClick={onSignOut}

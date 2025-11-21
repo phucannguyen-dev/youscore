@@ -356,7 +356,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                 </p>
                 
                 {/* Subject List */}
-                <div className="space-y-2 max-h-96 overflow-y-auto">
+                <div className="space-y-2 max-h-[32rem] lg:max-h-96 overflow-y-auto">
                     {(settings.customSubjects || []).map((subject) => (
                         <div key={subject} className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                             <span className="flex-1 text-sm font-medium text-slate-800 dark:text-slate-200">{subject}</span>
