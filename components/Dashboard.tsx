@@ -45,17 +45,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
           }
         }
       } else {
-        // Fallback to simple logic
+        // Fallback to simple logic (assuming Vietnamese school year: Sept-June)
         if (semestersPerYear === 2) {
-          semester = month >= 9 || month <= 12 ? 1 : 2;
+          // Semester 1: Sept-Dec (9-12), Semester 2: Jan-June (1-6)
+          semester = (month >= 9 && month <= 12) ? 1 : 2;
         } else if (semestersPerYear === 3) {
-          if (month >= 9 || month <= 12) semester = 1;
-          else if (month <= 4) semester = 2;
+          // Semester 1: Sept-Dec, Semester 2: Jan-Apr, Semester 3: May-Aug
+          if (month >= 9 && month <= 12) semester = 1;
+          else if (month >= 1 && month <= 4) semester = 2;
           else semester = 3;
         } else if (semestersPerYear === 4) {
-          if (month >= 9 || month <= 11) semester = 1;
-          else if (month === 12 || month <= 2) semester = 2;
-          else if (month <= 5) semester = 3;
+          // Semester 1: Sept-Nov, Semester 2: Dec-Feb, Semester 3: Mar-May, Semester 4: Jun-Aug
+          if (month >= 9 && month <= 11) semester = 1;
+          else if (month === 12 || (month >= 1 && month <= 2)) semester = 2;
+          else if (month >= 3 && month <= 5) semester = 3;
           else semester = 4;
         }
       }
