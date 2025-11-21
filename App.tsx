@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut, User as UserIcon } from 'lucide-react';
+import { Send, Sparkles, History, GraduationCap, Moon, Sun, Settings as SettingsIcon, CheckSquare, Trash2, Camera, LogOut, User as UserIcon, Search, X } from 'lucide-react';
 import { parseScoreFromText, parseScoresFromImage } from './services/geminiService';
 import { ScoreEntry, AppSettings, CustomFactor, Language } from './types';
 import { ScoreCard } from './components/ScoreCard';
@@ -94,6 +94,9 @@ function App() {
   // Selection State
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Settings state
   const [settings, setSettings] = useState<AppSettings>(() => {
@@ -469,6 +472,19 @@ function App() {
       }
   }, [scores, settings.sortOption]);
 
+  // Search and Filter Logic
+  const filteredScores = useMemo(() => {
+    if (!searchQuery.trim()) return sortedScores;
+    
+    const query = searchQuery.toLowerCase().trim();
+    return sortedScores.filter(score => 
+      score.subject.toLowerCase().includes(query) ||
+      score.examType.toLowerCase().includes(query) ||
+      score.originalText.toLowerCase().includes(query) ||
+      score.score.toString().includes(query)
+    );
+  }, [sortedScores, searchQuery]);
+
   // Derived available factors list
   const availableFactors = useMemo(() => settings.customFactors.map(f => f.name), [settings.customFactors]);
 
@@ -535,14 +551,6 @@ function App() {
             >
                 {isDarkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
             </button>
-            <button 
-                onClick={handleSignOut}
-                className="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-                aria-label="Đăng xuất"
-                title="Đăng xuất"
-            >
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
           </div>
         </div>
       </header>
@@ -576,18 +584,48 @@ function App() {
               {/* Left Column: Dashboard (Summary & Subject Groups) */}
               <div className="lg:sticky lg:top-20">
                 <Dashboard 
-                    scores={scores} 
+                    scores={searchQuery ? filteredScores : scores}
                     isDarkMode={isDarkMode} 
                     rounding={settings.rounding} 
                     customFactors={settings.customFactors}
                     defaultMaxScore={settings.defaultMaxScore}
                     semestersPerYear={settings.semestersPerYear}
                     semesterDurations={settings.semesterDurations}
+                    searchQuery={searchQuery}
                 />
               </div>
 
               {/* Right Column: History (Score List) */}
               <div>
+                {/* Search Bar */}
+                {scores.length > 0 && (
+                  <div className="mb-4 print:hidden">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
+                        className="w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm rounded-lg py-2.5 pl-10 pr-10 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                    {searchQuery && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 px-1">
+                        Tìm thấy {filteredScores.length} kết quả
+                      </p>
+                    )}
+                  </div>
+                )}
+                
                 {/* Recent List Header */}
                 {scores.length > 0 && (
                     <div className="flex items-center justify-between mb-4 px-1">
@@ -633,7 +671,7 @@ function App() {
                      </div>
                   )}
                   
-                  {sortedScores.map(score => (
+                  {filteredScores.map(score => (
                     <ScoreCard 
                         key={score.id} 
                         entry={score} 
@@ -664,6 +702,7 @@ function App() {
           <Profile 
             onBack={() => setCurrentView('home')}
             onAccountDeleted={handleSignOut}
+            onSignOut={handleSignOut}
           />
         )}
 
