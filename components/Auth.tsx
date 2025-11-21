@@ -88,7 +88,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
             <div className="space-y-2">
               <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
                 {isSignUp ? (
-                  <>Tạo tài khoản / <span className="text-muted-foreground">Create an account</span></>
+                  <>Đăng ký / <span className="text-muted-foreground">Sign up</span></>
                 ) : (
                   <>Đăng nhập / <span className="text-muted-foreground">Sign in</span></>
                 )}
