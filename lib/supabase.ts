@@ -97,6 +97,31 @@ export async function getScores(): Promise<Score[]> {
 }
 
 /**
+ * Update a score in the database
+ * @param id - Score ID to update
+ * @param updates - Partial score data to update
+ * @returns Promise with success boolean
+ */
+export async function updateScore(id: string, updates: Partial<Omit<Score, 'id' | 'created_at' | 'user_id'>>): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('scores')
+      .update(updates)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating score:', error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Exception updating score:', err);
+    return false;
+  }
+}
+
+/**
  * Delete a score from the database
  * @param id - Score ID to delete
  * @returns Promise with success boolean
