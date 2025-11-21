@@ -302,11 +302,11 @@ function App() {
           // Scroll to top of list smoothly
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          setError("Could not understand the score. Try 'Subject score was X/Y' or 'Have Physics 10 and Math 8 in mid-semester'");
+          setError("Không thể hiểu được điểm số. Thử 'Điểm môn học là X/Y' hoặc 'Có Vật lý 10 và Toán 8 trong giữa học kỳ'");
         }
       }
     } catch (err) {
-      setError("Something went wrong. Please check your connection.");
+      setError("Đã có lỗi xảy ra. Vui lòng kiểm tra kết nối của bạn.");
     } finally {
       setIsLoading(false);
     }

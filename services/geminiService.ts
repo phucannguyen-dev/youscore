@@ -149,7 +149,7 @@ export const parseBulkScoresFromText = async (
     return [];
   } catch (error) {
     console.error("Error parsing bulk scores with Gemini:", error);
-    throw new Error("Failed to interpret the scores. Please try again with a clearer sentence.");
+    throw new Error("Không thể hiểu được các điểm số. Vui lòng thử lại với câu rõ ràng hơn.");
   }
 };
 
