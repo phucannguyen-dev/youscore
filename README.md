@@ -6,9 +6,34 @@ No need to estimate scores, just tell and let the AI do the work!
 
 - 🔐 **User Authentication** - Secure login and signup with Supabase Auth
 - 📊 **Score Tracking** - Track your academic scores with AI-powered input
+- 🎯 **Bulk Input** - Add multiple test scores in one go! Example: "Have physics 10 and math 8 in mid-semester"
+- 🔍 **Smart Search** - Quickly find scores by subject, exam type, or score value
 - 🌙 **Dark Mode** - Beautiful dark mode support
 - 📱 **Responsive Design** - Works on all devices
 - 💾 **Cloud Storage** - Your data synced across devices with Supabase
+
+## How to Use
+
+### Single Score Entry
+Simply type in natural language:
+- "I got 10 in Math final exam"
+- "Physics score was 8.5"
+- "Có 9 điểm Văn học kỳ"
+
+### Bulk Score Entry (NEW!)
+Enter multiple scores at once:
+- "Have physics 10 and math 8 in mid-semester"
+- "Got English 9, Chemistry 8.5, and Biology 9.5 in final exam"
+- "Có Toán 10, Lý 9, và Hóa 8 trong kiểm tra 15 phút"
+
+The AI will automatically parse each subject and create separate entries with the same exam type!
+
+### Search & Filter
+Use the search bar to:
+- Filter by subject name
+- Find scores by exam type
+- Search by score value
+- Look up scores by original text
 
 ## Setup
 
@@ -123,7 +148,17 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 You can find these values in your Supabase project settings at:
 `https://app.supabase.com/project/_/settings/api`
 
-### 3. Run the App
+### 3. Configure Gemini AI (Optional)
+
+For AI-powered score parsing, you need a Gemini API key:
+
+1. Get your API key from [Google AI Studio](https://aistudio.google.com/apikey)
+2. Add to `.env.local`:
+```
+VITE_GEMINI_API_KEY=your_gemini_api_key
+```
+
+### 4. Run the App
 
 ```bash
 npm run dev
@@ -138,6 +173,26 @@ The app uses Supabase Auth for user authentication:
 - **Sign Out**: Log out from your account
 
 All scores are private and only visible to the authenticated user who created them.
+
+## Tips & Tricks
+
+### Using Bulk Input Effectively
+- You can add multiple subjects in one sentence
+- The AI will detect all subjects and their scores
+- All entries will share the same exam type if mentioned once
+- Supports both English and Vietnamese
+
+### Search Feature
+- The search bar appears above all content for easy access
+- Search works across subjects, exam types, and original text
+- Real-time results as you type
+- Clear button to quickly reset search
+
+### Managing Scores
+- Select multiple scores for batch deletion
+- Sort by date, subject, or score value
+- Filter by semester to view specific periods
+- Export and print your score reports
 
 ## Development
 
