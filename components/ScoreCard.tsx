@@ -163,21 +163,34 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   };
 
   return (
-    <div 
-      onClick={handleCardClick}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      style={{
-        transform: `translateX(${getSwipeOffset()}px)`,
-        transition: isSwiping ? 'none' : 'transform 0.3s ease-out'
-      }}
-      className={`bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 shadow-sm border transition-all hover:shadow-md flex items-center justify-between gap-2 sm:gap-4 group break-inside-avoid ${
-        isSelectMode ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''
-      } ${
-        isSelected ? 'border-indigo-500 ring-1 ring-indigo-500 dark:border-indigo-400 dark:ring-indigo-400' : 'border-slate-100 dark:border-slate-800'
-      }`}
-    >
+    <div className="relative overflow-hidden rounded-xl">
+      {/* Red delete background trail */}
+      {isSwiping && (
+        <div 
+          className="absolute inset-0 bg-red-500 dark:bg-red-600 flex items-center justify-end pr-6"
+          style={{
+            opacity: Math.min(Math.abs(getSwipeOffset()) / SWIPE_THRESHOLD, 1)
+          }}
+        >
+          <Trash2 className="w-6 h-6 text-white" />
+        </div>
+      )}
+      
+      <div 
+        onClick={handleCardClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: `translateX(${getSwipeOffset()}px)`,
+          transition: isSwiping ? 'none' : 'transform 0.3s ease-out'
+        }}
+        className={`bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 shadow-sm border transition-all hover:shadow-md flex items-center justify-between gap-2 sm:gap-4 group break-inside-avoid relative ${
+          isSelectMode ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''
+        } ${
+          isSelected ? 'border-indigo-500 ring-1 ring-indigo-500 dark:border-indigo-400 dark:ring-indigo-400' : 'border-slate-100 dark:border-slate-800'
+        }`}
+      >
       {/* Selection Checkbox */}
       {isSelectMode && (
         <div className="mr-2 sm:mr-4 text-indigo-600 dark:text-indigo-400">
@@ -281,13 +294,14 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
         {!isSelectMode && (
           <button 
             onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
-            className="p-1.5 sm:p-2 text-slate-300 hover:text-red-500 dark:text-slate-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 print:hidden"
+            className="p-1.5 sm:p-2 text-slate-300 hover:text-red-500 dark:text-slate-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 print:hidden hidden sm:block"
             aria-label="Xóa điểm"
           >
             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         )}
       </div>
+    </div>
     </div>
   );
 };
