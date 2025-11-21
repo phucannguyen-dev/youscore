@@ -8,9 +8,10 @@ No need to estimate scores, just tell and let the AI do the work!
 - 📊 **Score Tracking** - Track your academic scores with AI-powered input
 - 🎯 **Bulk Input** - Add multiple test scores in one go! Example: "Have physics 10 and math 8 in mid-semester"
 - 🔍 **Smart Search** - Quickly find scores by subject, exam type, or score value
-- 🌙 **Dark Mode** - Beautiful dark mode support
+- 🌙 **Dark Mode** - Beautiful dark mode support with theme-neutral design
 - 📱 **Responsive Design** - Works on all devices
 - 💾 **Cloud Storage** - Your data synced across devices with Supabase
+- 🎨 **Modern UI** - Built with shadcn/ui components and Tailwind CSS
 
 ## How to Use
 
@@ -194,6 +195,38 @@ All scores are private and only visible to the authenticated user who created th
 - Filter by semester to view specific periods
 - Export and print your score reports
 
+## UI Design System
+
+YouScore uses [shadcn/ui](https://ui.shadcn.com/) components built on top of Tailwind CSS v3 for a modern, accessible, and theme-neutral design system.
+
+### Theme Customization
+
+The application uses CSS variables for all colors, making it easy to customize the theme:
+
+```css
+/* Edit index.css to customize colors */
+:root {
+  --primary: 238 83% 60%;        /* Primary brand color */
+  --secondary: 210 40% 96.1%;    /* Secondary elements */
+  --background: 0 0% 100%;        /* Page background */
+  --foreground: 222.2 84% 4.9%;  /* Text color */
+  /* ... and more */
+}
+```
+
+### Available Components
+
+The app includes reusable shadcn/ui components:
+- **Button** - Multiple variants (default, destructive, outline, secondary, ghost, link)
+- **Input** - Form inputs with accessibility features
+- **Card** - Content containers with headers and footers
+- **Badge** - Status indicators
+- **Select** - Dropdown menus
+- **Switch** - Toggle controls
+- **Label** - Form field labels
+
+See `MIGRATION_SUMMARY.md` for complete documentation on the UI system.
+
 ## Development
 
 ```bash
@@ -206,3 +239,11 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+## Architecture
+
+- **Frontend**: React 19 with TypeScript
+- **Styling**: Tailwind CSS v3 + shadcn/ui components
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **AI**: Google Gemini for natural language processing
+- **Build Tool**: Vite
