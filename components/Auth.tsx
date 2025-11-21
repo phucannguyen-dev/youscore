@@ -140,11 +140,7 @@ export function Auth({ onSignIn, onSignUp, message, isLoading, initialLanguage =
               {/* Password Input */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
-                  {isSignUp ? (
-                    <>Mật khẩu / <span className="text-muted-foreground">Password</span></>
-                  ) : (
-                    <>Mật khẩu / <span className="text-muted-foreground">Password</span></>
-                  )}
+                  Mật khẩu / <span className="text-muted-foreground">Password</span>
                 </Label>
                 <Input
                   id="password"
