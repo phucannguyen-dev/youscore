@@ -10,6 +10,9 @@ import { Auth } from './components/Auth';
 import { addScore, getScores, deleteScore, updateScore, Score, signIn, signUp, signOut, onAuthStateChange, User, upsertUserProfile, getUserSettings, saveUserSettings } from './lib/supabase';
 import { useTranslation } from './lib/translations';
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { Button } from './components/ui/button';
+import { Input } from './components/ui/input';
+import { Badge } from './components/ui/badge';
 
 // Default factors requested by user
 const DEFAULT_FACTORS: CustomFactor[] = [
@@ -566,48 +569,53 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 md:pb-32 relative font-sans text-slate-900 dark:text-slate-100 selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 transition-colors duration-300">
+    <div className="min-h-screen bg-background pb-24 md:pb-32 relative font-sans text-foreground selection:bg-primary/10 transition-colors duration-300">
       
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-10 bg-opacity-80 dark:bg-opacity-80 backdrop-blur-md transition-colors print:hidden">
+      <header className="bg-card border-b border-border sticky top-0 z-10 bg-opacity-80 backdrop-blur-md transition-colors print:hidden">
         <div className="mx-auto px-4 h-16 flex items-center justify-between lg:max-w-7xl md:max-w-4xl max-w-2xl">
           <div 
-            className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 cursor-pointer"
+            className="flex items-center gap-2 text-primary cursor-pointer"
             onClick={() => setCurrentView('home')}
           >
-            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm">
-                <GraduationCap className="w-5 h-5 text-white" />
+            <div className="bg-primary p-1.5 rounded-lg shadow-sm">
+                <GraduationCap className="w-5 h-5 text-primary-foreground" />
             </div>
-            <h1 className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">YouScore</h1>
+            <h1 className="font-bold text-xl tracking-tight text-foreground">YouScore</h1>
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="text-xs font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md mr-1 hidden sm:block">
+            <Badge variant="secondary" className="hidden sm:inline-flex">
                 Beta
-            </div>
-            <button 
+            </Badge>
+            <Button 
+                variant="ghost"
+                size="icon"
                 onClick={() => setCurrentView(currentView === 'profile' ? 'home' : 'profile')}
-                className={`p-1.5 sm:p-2 rounded-full transition-colors ${currentView === 'profile' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                className={currentView === 'profile' ? 'bg-primary/10 text-primary' : ''}
                 aria-label="Hồ sơ"
                 title="Hồ sơ cá nhân"
             >
-                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <button 
+                <UserIcon className="h-5 w-5" />
+            </Button>
+            <Button 
+                variant="ghost"
+                size="icon"
                 onClick={() => setCurrentView(currentView === 'settings' ? 'home' : 'settings')}
-                className={`p-1.5 sm:p-2 rounded-full transition-colors ${currentView === 'settings' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+                className={currentView === 'settings' ? 'bg-primary/10 text-primary' : ''}
                 aria-label="Cài đặt"
                 title="Cài đặt"
             >
-                <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            <button 
+                <SettingsIcon className="h-5 w-5" />
+            </Button>
+            <Button 
+                variant="ghost"
+                size="icon"
                 onClick={toggleTheme}
-                className="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                 aria-label="Giao diện"
             >
-                {isDarkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-            </button>
+                {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
       </header>
@@ -641,25 +649,27 @@ function App() {
             {scores.length > 0 && (
               <div className="mb-6 print:hidden">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
-                  <input
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
-                    className="w-full bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm rounded-lg py-2.5 pl-10 pr-10 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
+                    className="pl-10 pr-10"
                   />
                   {searchQuery && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
                     >
-                      <X className="w-4 h-4" />
-                    </button>
+                      <X className="h-4 w-4" />
+                    </Button>
                   )}
                 </div>
                 {searchQuery && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 px-1">
+                  <p className="text-xs text-muted-foreground mt-2 px-1">
                     Tìm thấy {filteredScores.length} kết quả
                   </p>
                 )}
@@ -688,12 +698,14 @@ function App() {
                 {/* Recent List Header */}
                 {scores.length > 0 && (
                     <div className="flex items-center justify-between mb-4 px-1">
-                        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             <History className="w-4 h-4" /> Lịch sử
                         </h2>
                         <div className="flex gap-2 print:hidden">
                           {isSelectMode ? (
-                            <button 
+                            <Button
+                              variant="link"
+                              size="sm"
                               onClick={() => {
                                 if (selectedIds.size === scores.length) {
                                   setSelectedIds(new Set());
@@ -701,17 +713,19 @@ function App() {
                                   setSelectedIds(new Set(scores.map(s => s.id)));
                                 }
                               }}
-                              className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                              className="h-auto p-0 text-xs"
                             >
                               {selectedIds.size === scores.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-                            </button>
+                            </Button>
                           ) : (
-                            <button 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={toggleSelectMode}
-                              className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors"
+                              className="h-auto p-0 text-xs"
                             >
-                              <CheckSquare className="w-3.5 h-3.5" /> Chọn
-                            </button>
+                              <CheckSquare className="w-3.5 h-3.5 mr-1" /> Chọn
+                            </Button>
                           )}
                         </div>
                     </div>
@@ -770,7 +784,7 @@ function App() {
 
       {/* Input Area or Bulk Actions - Sticky Bottom (Only on Home) */}
       {currentView === 'home' && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 pb-6 md:pb-4 z-20 transition-colors print:hidden">
+        <div className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-md border-t border-border p-4 pb-6 md:pb-4 z-20 transition-colors print:hidden">
            <div className="mx-auto relative lg:max-w-7xl md:max-w-4xl max-w-2xl">
               {error && !isSelectMode && (
                   <div className="absolute -top-16 left-0 right-0 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-xs py-2 px-3 rounded-lg border border-red-100 dark:border-red-800 text-center mb-2">
@@ -781,36 +795,42 @@ function App() {
               {isSelectMode ? (
                 <div className="flex items-center justify-between animate-in slide-in-from-bottom-5">
                    <div className="flex items-center gap-4">
-                      <button 
+                      <Button
+                        variant="secondary"
                         onClick={toggleSelectMode}
-                        className="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        size="sm"
+                        className="rounded-full"
                       >
                         Hủy
-                      </button>
-                      <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      </Button>
+                      <span className="text-sm font-medium text-muted-foreground">
                         Đã chọn {selectedIds.size}
                       </span>
                    </div>
-                   <button 
+                   <Button
+                      variant="destructive"
                       onClick={handleBulkDelete}
                       disabled={selectedIds.size === 0}
-                      className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 disabled:bg-red-300 dark:disabled:bg-red-900/30 text-white text-sm font-medium transition-colors flex items-center gap-2 shadow-md shadow-red-200 dark:shadow-none"
+                      size="sm"
+                      className="rounded-full"
                    >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 mr-2" />
                       Xóa ({selectedIds.size})
-                   </button>
+                   </Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
-                    <button 
+                    <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => fileInputRef.current?.click()}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 p-1.5 sm:p-2 transition-colors rounded-full"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10"
                         title="Upload score image"
                         disabled={isLoading}
                     >
-                        <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
+                        <Camera className="h-5 w-5" />
+                    </Button>
                     <input 
                         type="file" 
                         ref={fileInputRef} 
@@ -819,25 +839,26 @@ function App() {
                         onChange={handleFileSelect}
                     />
 
-                    <input
+                    <Input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Nhập 'Có Vật lý 10 và Toán 8 trong giữa học kỳ' hoặc tải lên bảng điểm"
-                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm sm:text-base rounded-full py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/40 transition-all"
+                        className="rounded-full pl-12 pr-14 py-6"
                         disabled={isLoading}
                     />
-                    <button 
+                    <Button
                         type="submit" 
                         disabled={isLoading || !input.trim()}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white p-1.5 sm:p-2 rounded-full transition-colors shadow-md"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
                     >
                         {isLoading ? (
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
-                            <Send className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />
+                            <Send className="h-5 w-5" />
                         )}
-                    </button>
+                    </Button>
                 </form>
               )}
            </div>
