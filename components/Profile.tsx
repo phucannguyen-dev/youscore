@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save, UserCircle, Lock, Trash2, LogOut } from 'lucide-react';
-import { getUserProfile, upsertUserProfile, updatePassword, deleteAccount, UserProfile, getCurrentUser } from '../lib/supabase';
+import { getUserProfile, upsertUserProfile, updatePassword, deleteAccount, getCurrentUser } from '../lib/supabase';
 import { AppSettings } from '../types';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+
+interface UserProfile {
+  id?: string;
+  full_name?: string | null;
+}
 
 interface ProfileProps {
   onBack: () => void;

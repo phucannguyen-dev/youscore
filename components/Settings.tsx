@@ -158,7 +158,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm shadow-sm"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-primary-foreground px-4 py-2 rounded-lg transition-colors font-medium text-sm shadow-sm"
         >
           {isSaving ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -185,7 +185,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                     <select 
                         value={settings.sortOption}
                         onChange={(e) => handleChange('sortOption', e.target.value as any)}
-                        className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                     >
                         <option value="date_desc">Mới nhất (Theo ngày)</option>
                         <option value="date_asc">Cũ nhất (Theo ngày)</option>
@@ -208,7 +208,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                             onChange={(e) => handleChange('showDates', e.target.checked)}
                             className="sr-only peer" 
                         />
-                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
                 </div>
             </div>
@@ -265,7 +265,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                             value={newFactorName}
                             onChange={(e) => setNewFactorName(e.target.value)}
                             placeholder="Tên hệ số (ví dụ: Cuối học kì)"
-                            className="flex-1 p-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                            className="flex-1 p-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-2 focus:ring-primary/30 outline-none"
                             autoFocus
                         />
                          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 rounded-md px-2 border border-slate-200 dark:border-slate-700">
@@ -281,7 +281,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                         </div>
                         <button 
                             onClick={handleAddFactor}
-                            className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+                            className="p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors"
                         >
                             <Plus className="w-4 h-4" />
                         </button>
@@ -295,7 +295,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                 ) : (
                     <button 
                         onClick={() => setIsAddingFactor(true)}
-                        className="w-full py-2 flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-900/30 rounded-lg transition-all border-dashed"
+                        className="w-full py-2 flex items-center justify-center gap-2 text-sm font-medium text-primary bg-primary/10 dark:text-primary dark:bg-primary/20 hover:bg-primary/15 dark:hover:bg-primary/30 border border-primary/20 dark:border-primary/30 rounded-lg transition-all border-dashed"
                     >
                         <Plus className="w-4 h-4" /> Thêm hệ số
                     </button>
@@ -318,7 +318,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                                 onClick={() => handleChange('rounding', places as 0 | 1 | 2)}
                                 className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all ${
                                     settings.rounding === places 
-                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-900/30 dark:border-indigo-800 dark:text-indigo-300' 
+                                    ? 'bg-primary/10 border-primary/30 text-primary dark:bg-primary/20 dark:border-primary/30 dark:text-primary' 
                                     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                             >
@@ -334,7 +334,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                         type="number" 
                         value={settings.defaultMaxScore}
                         onChange={(e) => handleChange('defaultMaxScore', parseInt(e.target.value) || 10)}
-                        className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                         min="1"
                     />
                     <p className="text-xs text-slate-500 mt-1">Được sử dụng khi không cho biết tối đa (ví dụ: "Đạt 8 môn Toán")</p>
@@ -380,12 +380,12 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                             value={newSubjectName}
                             onChange={(e) => setNewSubjectName(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleAddSubject()}
-                            className="flex-1 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                            className="flex-1 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                             autoFocus
                         />
                         <button 
                             onClick={handleAddSubject}
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
+                            className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium"
                         >
                             Thêm
                         </button>
@@ -402,7 +402,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                 ) : (
                     <button 
                         onClick={() => setIsAddingSubject(true)}
-                        className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-400 hover:border-indigo-400 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400 transition-colors"
+                        className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary-400 transition-colors"
                     >
                         <Plus className="w-5 h-5" />
                         Thêm môn học mới
@@ -422,7 +422,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                     <select 
                         value={settings.semestersPerYear}
                         onChange={(e) => handleChange('semestersPerYear', parseInt(e.target.value))}
-                        className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                     >
                         <option value="1">1 (Mỗi năm)</option>
                         <option value="2">2 (Học kỳ chuẩn)</option>
@@ -457,7 +457,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                       <select 
                         value={duration.startMonth}
                         onChange={(e) => handleSemesterDurationChange(index, 'startMonth', parseInt(e.target.value))}
-                        className="w-full p-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full p-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       >
                         {MONTHS.map(month => (
                           <option key={month.value} value={month.value}>
@@ -474,7 +474,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                       <select 
                         value={duration.endMonth}
                         onChange={(e) => handleSemesterDurationChange(index, 'endMonth', parseInt(e.target.value))}
-                        className="w-full p-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        className="w-full p-2 text-sm rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       >
                         {MONTHS.map(month => (
                           <option key={month.value} value={month.value}>
