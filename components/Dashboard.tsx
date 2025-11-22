@@ -149,7 +149,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
   return (
     <div className="mb-8 space-y-6">
       {/* Semester Selector */}
-      <div className="flex items-center gap-3 justify-between flex-wrap">
+      <div id="summary" className="flex items-center gap-3 justify-between flex-wrap scroll-mt-20">
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
           <TrendingUp className="w-4 h-4" /> Thống kê
         </h3>
@@ -197,7 +197,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
       </div>
 
       {/* Subject Breakdown Tables */}
-      <div className="space-y-6">
+      <div id="score-groups" className="space-y-6 scroll-mt-20">
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng hợp</h3>
         
         <div className="grid gap-6 md:grid-cols-1"> 
