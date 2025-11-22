@@ -150,15 +150,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
     <div className="mb-8 space-y-6">
       {/* Semester Selector */}
       <div id="summary" className="flex items-center gap-3 justify-between flex-wrap scroll-mt-20">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <TrendingUp className="w-4 h-4" /> Thống kê
         </h3>
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <Calendar className="w-4 h-4 text-muted-foreground" />
           <select 
             value={selectedSemester}
             onChange={(e) => setSelectedSemester(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-            className="text-sm p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+            className="text-sm p-2 rounded-lg bg-background border border-border text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
           >
             <option value="all">Tất cả</option>
             {Array.from({ length: semestersPerYear }, (_, i) => (
@@ -167,10 +167,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
           </select>
         </div>
       </div>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-primary dark:bg-primary text-primary-foreground p-3 sm:p-4 rounded-2xl shadow-lg shadow-primary/20 dark:shadow-none">
+        <div className="bg-primary text-primary-foreground p-3 sm:p-4 rounded-2xl shadow-lg shadow-primary/30">
             <div className="flex items-center gap-2 opacity-80 mb-1">
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="text-xs font-medium uppercase">Trung bình</span>
@@ -180,55 +179,53 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
                 <span className="text-xs opacity-70 ml-0.5 font-normal">/{defaultMaxScore}</span>
             </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-1">
+        <div className="bg-card p-3 sm:p-4 rounded-2xl shadow-sm border border-border">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="text-xs font-medium uppercase">Số lượng</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">{stats.total}</div>
+            <div className="text-xl sm:text-2xl font-bold text-foreground">{stats.total}</div>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-1">
+        <div className="bg-card p-3 sm:p-4 rounded-2xl shadow-sm border border-border">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Award className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="text-xs font-medium uppercase">Môn học cao nhất</span>
+                <span className="text-xs font-medium uppercase">Cao nhất</span>
             </div>
-            <div className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate">{stats.bestSubject}</div>
+            <div className="text-base sm:text-lg font-bold text-foreground truncate">{stats.bestSubject}</div>
         </div>
       </div>
-
       {/* Subject Breakdown Tables */}
       <div id="score-groups" className="space-y-6 scroll-mt-20">
-        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng hợp</h3>
-        
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Tổng hợp</h3>
         <div className="grid gap-6 md:grid-cols-1"> 
             {stats.subjectData.map((subject) => (
-                <div key={subject.name} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-                    <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
-                        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">{subject.name}</h4>
-                        <div className="text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full bg-primary/10 text-primary dark:bg-primary/30 dark:text-primary-foreground border border-primary/20 dark:border-primary/80">
+                <div key={subject.name} className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+                    <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-border bg-muted flex items-center justify-between">
+                        <h4 className="font-bold text-foreground text-base sm:text-lg">{subject.name}</h4>
+                        <div className="text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full bg-secondary text-secondary-foreground border border-border">
                             {subject.average.toFixed(rounding)}
                             <span className="text-xs opacity-70 ml-0.5">/{defaultMaxScore}</span>
                         </div>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-xs sm:text-sm text-left">
-                            <thead className="text-xs uppercase bg-slate-50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+                            <thead className="text-xs uppercase bg-muted border-b border-border text-muted-foreground">
                                 <tr>
                                     <th className="px-3 sm:px-5 py-2 sm:py-3 font-medium w-1/3">Loại bài kiểm tra</th>
                                     <th className="px-3 sm:px-5 py-2 sm:py-3 font-medium w-1/3">Điểm số</th>
                                     <th className="px-3 sm:px-5 py-2 sm:py-3 font-medium w-1/3 text-right">Ngày</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            <tbody className="divide-y divide-border">
                                 {subject.entries.map((entry) => (
-                                    <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                        <td className="px-3 sm:px-5 py-2 sm:py-3 text-slate-700 dark:text-slate-300">
+                                    <tr key={entry.id} className="hover:bg-muted transition-colors">
+                                        <td className="px-3 sm:px-5 py-2 sm:py-3 text-foreground">
                                             {entry.examType}
                                         </td>
-                                        <td className="px-3 sm:px-5 py-2 sm:py-3 font-medium text-slate-800 dark:text-slate-200">
-                                            {entry.score} <span className="text-slate-400 text-xs font-normal">/{entry.maxScore}</span>
+                                        <td className="px-3 sm:px-5 py-2 sm:py-3 font-medium text-foreground">
+                                            {entry.score} <span className="text-muted-foreground text-xs font-normal">/{entry.maxScore}</span>
                                         </td>
-                                        <td className="px-3 sm:px-5 py-2 sm:py-3 text-right text-slate-500 dark:text-slate-500 whitespace-nowrap">
+                                        <td className="px-3 sm:px-5 py-2 sm:py-3 text-right text-muted-foreground whitespace-nowrap">
                                             {new Date(entry.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                         </td>
                                     </tr>

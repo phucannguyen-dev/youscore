@@ -158,7 +158,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-primary/40 text-primary-foreground px-4 py-2 rounded-lg transition-colors font-medium text-sm shadow-sm"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-primary-foreground px-4 py-2 rounded-lg transition-colors font-medium text-sm shadow-sm"
         >
           {isSaving ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -208,7 +208,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                             onChange={(e) => handleChange('showDates', e.target.checked)}
                             className="sr-only peer" 
                         />
-                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/80 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
                 </div>
             </div>
@@ -265,7 +265,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                             value={newFactorName}
                             onChange={(e) => setNewFactorName(e.target.value)}
                             placeholder="Tên hệ số (ví dụ: Cuối học kì)"
-                            className="flex-1 p-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
+                            className="flex-1 p-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-2 focus:ring-primary/30 outline-none"
                             autoFocus
                         />
                          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 rounded-md px-2 border border-slate-200 dark:border-slate-700">
@@ -295,7 +295,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                 ) : (
                     <button 
                         onClick={() => setIsAddingFactor(true)}
-                        className="w-full py-2 flex items-center justify-center gap-2 text-sm font-medium text-primary dark:text-primary/80 bg-primary/5 dark:bg-primary/20 hover:bg-primary/10 dark:hover:bg-primary/30 border border-primary/10 dark:border-primary/30 rounded-lg transition-all border-dashed"
+                        className="w-full py-2 flex items-center justify-center gap-2 text-sm font-medium text-primary bg-primary/10 dark:text-primary dark:bg-primary/20 hover:bg-primary/15 dark:hover:bg-primary/30 border border-primary/20 dark:border-primary/30 rounded-lg transition-all border-dashed"
                     >
                         <Plus className="w-4 h-4" /> Thêm hệ số
                     </button>
@@ -318,7 +318,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                                 onClick={() => handleChange('rounding', places as 0 | 1 | 2)}
                                 className={`py-2 px-3 rounded-lg text-sm font-medium border transition-all ${
                                     settings.rounding === places 
-                                    ? 'bg-primary/5 border-primary/20 text-primary dark:bg-primary/30 dark:border-primary/80 dark:text-primary-foreground' 
+                                    ? 'bg-primary/10 border-primary/30 text-primary dark:bg-primary/20 dark:border-primary/30 dark:text-primary' 
                                     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
                                 }`}
                             >
@@ -402,7 +402,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, settings, onUpdateSe
                 ) : (
                     <button 
                         onClick={() => setIsAddingSubject(true)}
-                        className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary transition-colors"
+                        className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary-400 transition-colors"
                     >
                         <Plus className="w-5 h-5" />
                         Thêm môn học mới

@@ -559,7 +559,7 @@ function App() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary/20 dark:border-primary/80 border-t-primary dark:border-t-primary/40 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/30 dark:border-primary/30 border-t-primary dark:border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -640,8 +640,8 @@ function App() {
             {/* Welcome / Empty State */}
             {scores.length === 0 && !isLoading && (
               <div className="text-center py-12 space-y-4 print:hidden">
-                <div className="w-16 h-16 bg-primary/5 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-8 h-8 text-primary dark:text-primary/80" />
+                <div className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-8 h-8 text-primary dark:text-primary" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Theo dõi điểm của bạn</h2>
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
@@ -661,7 +661,7 @@ function App() {
                       {index > 0 && <span className="text-slate-300 dark:text-slate-700">•</span>}
                       <a 
                         href={`#${link.id}`}
-                        className="text-sm font-medium text-primary dark:text-primary/80 hover:text-primary/80 dark:hover:text-primary/60 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/5 dark:hover:bg-primary/20"
+                        className="text-sm font-medium text-primary hover:text-primary/90 dark:text-primary dark:hover:text-primary/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/10 dark:hover:bg-primary/20"
                         onClick={(e) => {
                           e.preventDefault();
                           document.getElementById(link.id)?.scrollIntoView({ 
@@ -768,7 +768,7 @@ function App() {
                 {/* Score List */}
                 <div className="space-y-3 mb-24 lg:mb-32 print:mb-0">
                   {isLoading && (
-                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-primary/10 dark:border-primary/30 animate-pulse flex gap-4">
+                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-primary/20 dark:border-primary/30 animate-pulse flex gap-4">
                         <div className="flex-1 space-y-3">
                             <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
                             <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
