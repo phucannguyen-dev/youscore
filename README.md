@@ -133,13 +133,7 @@ create policy "Users can update own settings"
   using (auth.uid() = user_id);
 ```
 
-3. Copy `.env.local.example` to `.env.local`:
-
-```bash
-cp .env.local.example .env.local
-```
-
-4. Update `.env.local` with your Supabase credentials:
+3. Create and update `.env.local` with your Supabase credentials:
 
 ```
 VITE_SUPABASE_URL=your_supabase_project_url
