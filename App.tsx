@@ -652,37 +652,6 @@ function App() {
               </div>
             )}
 
-            {/* Search Bar - Now above the two-column layout */}
-            {scores.length > 0 && (
-              <div className="mb-6 print:hidden">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
-                    className="pl-10 pr-10"
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                {searchQuery && (
-                  <p className="text-xs text-muted-foreground mt-2 px-1">
-                    Tìm thấy {filteredScores.length} kết quả
-                  </p>
-                )}
-              </div>
-            )}
-
             {/* Quick Navigation - Anchor Links */}
             {scores.length > 0 && (
               <div className="mb-6 print:hidden">
@@ -728,6 +697,37 @@ function App() {
 
               {/* Right Column: History (Score List) */}
               <div id="history" className="scroll-mt-20">
+                
+                {/* Search Bar - On top of history column, mobile and desktop */}
+                {scores.length > 0 && (
+                  <div className="mb-4 print:hidden">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
+                        className="pl-10 pr-10"
+                      />
+                      {searchQuery && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    {searchQuery && (
+                      <p className="text-xs text-muted-foreground mt-2 px-1">
+                        Tìm thấy {filteredScores.length} kết quả
+                      </p>
+                    )}
+                  </div>
+                )}
                 
                 {/* Recent List Header */}
                 {scores.length > 0 && (

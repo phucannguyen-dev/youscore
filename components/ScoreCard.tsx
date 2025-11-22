@@ -46,14 +46,14 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const subjectInputRef = useRef<HTMLSelectElement>(null);
   
-  // Swipe gesture state
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
-  const [isSwiping, setIsSwiping] = useState(false);
+  // Hold gesture state (replacing swipe)
+  const [touchStartTime, setTouchStartTime] = useState<number | null>(null);
+  const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
+  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Swipe gesture constants
-  const SWIPE_THRESHOLD = 100; // pixels
-  const MAX_SWIPE_DISTANCE = 150; // pixels
+  // Hold gesture constants
+  const HOLD_DURATION = 500; // milliseconds
+  const MOVE_THRESHOLD = 10; // pixels - if user moves more than this, cancel hold
 
   const percentage = (entry.score / entry.maxScore) * 100;
   const colorClass = getScoreColor(percentage);
@@ -146,88 +146,86 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
     }
   };
 
-  // Swipe gesture handlers
+  // Hold gesture handlers (replacing swipe)
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isSelectMode || isEditing) return;
-    setTouchStartX(e.touches[0].clientX);
-    setIsSwiping(true);
+    if (isEditing) return;
+    
+    // If already in select mode, just handle normal click
+    if (isSelectMode) return;
+    
+    const touch = e.touches[0];
+    setTouchStartTime(Date.now());
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    
+    // Start hold timer
+    holdTimerRef.current = setTimeout(() => {
+      // Hold gesture completed - enter select mode and select this card
+      if (onToggleSelect) {
+        onToggleSelect(entry.id);
+        // Provide haptic feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+      }
+    }, HOLD_DURATION);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isSelectMode || isEditing || touchStartX === null) return;
-    const currentX = e.touches[0].clientX;
-    const swipeDistance = touchStartX - currentX;
+    if (isEditing || !touchStartPos) return;
     
-    // Only prevent default if user is swiping left (to avoid interfering with scroll)
-    if (swipeDistance > 0) {
-      e.preventDefault();
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+    
+    // If user moved too much, cancel the hold gesture
+    if (deltaX > MOVE_THRESHOLD || deltaY > MOVE_THRESHOLD) {
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current);
+        holdTimerRef.current = null;
+      }
+      setTouchStartTime(null);
+      setTouchStartPos(null);
     }
-    
-    setTouchCurrentX(currentX);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isSelectMode || isEditing || touchStartX === null) {
-      setTouchStartX(null);
-      setTouchCurrentX(null);
-      setIsSwiping(false);
-      return;
-    }
-
-    const swipeDistance = touchStartX - (touchCurrentX || touchStartX);
-    
-    if (swipeDistance > SWIPE_THRESHOLD) {
-      // Swiped left - delete
-      e.stopPropagation();
-      onDelete(entry.id);
+    // Clean up hold timer
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
     }
     
-    // Reset swipe state
-    setTouchStartX(null);
-    setTouchCurrentX(null);
-    setIsSwiping(false);
+    setTouchStartTime(null);
+    setTouchStartPos(null);
   };
 
-  // Calculate swipe offset for visual feedback
-  const getSwipeOffset = () => {
-    if (!isSwiping || touchStartX === null || touchCurrentX === null) return 0;
-    const offset = touchCurrentX - touchStartX;
-    // Only allow left swipe (negative offset), limit to -MAX_SWIPE_DISTANCE
-    return Math.max(Math.min(offset, 0), -MAX_SWIPE_DISTANCE);
-  };
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative overflow-hidden rounded-xl">
-      {/* Red delete background trail */}
-      {isSwiping && (
-        <div 
-          className="absolute inset-0 bg-red-500 dark:bg-red-600 flex items-center justify-end pr-6"
-          style={{
-            opacity: Math.min(Math.abs(getSwipeOffset()) / SWIPE_THRESHOLD, 1)
-          }}
-        >
-          <Trash2 className="w-6 h-6 text-white" />
-        </div>
-      )}
+      {/* No swipe visual feedback needed anymore */}
       
       <div 
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        style={{
-          transform: `translateX(${getSwipeOffset()}px)`,
-          transition: isSwiping ? 'none' : 'transform 0.3s ease-out'
-        }}
         className={`bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 shadow-sm border transition-all hover:shadow-md flex items-center justify-between gap-2 sm:gap-4 group break-inside-avoid relative ${
           isSelectMode ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''
         } ${
-          isSelected ? 'border-indigo-500 ring-1 ring-indigo-500 dark:border-indigo-400 dark:ring-indigo-400' : 'border-slate-100 dark:border-slate-800'
+          isSelected ? 'border-primary ring-1 ring-primary dark:border-primary/80 dark:ring-primary/80' : 'border-slate-100 dark:border-slate-800'
         }`}
       >
       {/* Selection Checkbox */}
       {isSelectMode && (
-        <div className="mr-2 sm:mr-4 text-indigo-600 dark:text-indigo-400">
+        <div className="mr-2 sm:mr-4 text-primary dark:text-primary/80">
           {isSelected ? <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5" /> : <Square className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 dark:text-slate-600" />}
         </div>
       )}
@@ -260,7 +258,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
 
             {showDate && (
               <div className="relative group/date">
-                  <span className="text-xs text-slate-400 dark:text-slate-500 flex items-center group-hover/date:text-indigo-500 dark:group-hover/date:text-indigo-400 transition-colors cursor-pointer" title={dateDisplay}>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 flex items-center group-hover/date:text-primary dark:group-hover/date:text-primary/80 transition-colors cursor-pointer" title={dateDisplay}>
                     <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                     {dateDisplay}
                   </span>
@@ -286,7 +284,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
               value={editSubject}
               onChange={e => setEditSubject(e.target.value)}
               onKeyDown={handleSubjectKeyDown}
-              className="flex-1 text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border-b-2 border-indigo-500 focus:outline-none px-1 py-0.5 cursor-pointer"
+              className="flex-1 text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border-b-2 border-primary focus:outline-none px-1 py-0.5 cursor-pointer"
             >
               {/* Include current subject if not in availableSubjects list */}
               {!availableSubjects.includes(editSubject) && editSubject && (
@@ -307,7 +305,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
           <div className="flex items-center gap-1 group/subject mb-1">
             <h3 
               onClick={startEditingSubject}
-              className={`text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate ${isSelectMode ? '' : 'cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400'}`}
+              className={`text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100 truncate ${isSelectMode ? '' : 'cursor-pointer hover:text-primary dark:hover:text-primary/80'}`}
               title={isSelectMode ? entry.subject : `${entry.subject} (Click to edit)`}
             >
               {entry.subject}
@@ -323,14 +321,14 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
 
       <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
         {isEditing ? (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-lg border bg-white dark:bg-slate-800 border-indigo-200 dark:border-indigo-800 shadow-sm animate-in fade-in zoom-in-95" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-lg border bg-white dark:bg-slate-800 border-primary/20 dark:border-primary/80 shadow-sm animate-in fade-in zoom-in-95" onClick={e => e.stopPropagation()}>
                 <input 
                     ref={inputRef}
                     type="number" 
                     value={editValues.score}
                     onChange={e => setEditValues(prev => ({...prev, score: e.target.value}))}
                     onKeyDown={handleKeyDown}
-                    className="w-10 sm:w-12 text-right bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-indigo-500 outline-none text-xs sm:text-sm font-bold text-slate-900 dark:text-white p-0"
+                    className="w-10 sm:w-12 text-right bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-primary outline-none text-xs sm:text-sm font-bold text-slate-900 dark:text-white p-0"
                     step="any"
                 />
                 <span className="text-slate-400 text-xs sm:text-sm">/</span>
@@ -339,7 +337,7 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({
                     value={editValues.max}
                     onChange={e => setEditValues(prev => ({...prev, max: e.target.value}))}
                     onKeyDown={handleKeyDown}
-                    className="w-10 sm:w-12 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-indigo-500 outline-none text-xs sm:text-sm text-slate-500 p-0"
+                    className="w-10 sm:w-12 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-primary outline-none text-xs sm:text-sm text-slate-500 p-0"
                     step="any"
                 />
                 <button onClick={saveEdit} className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded ml-1"><Check className="w-3 h-3" /></button>
