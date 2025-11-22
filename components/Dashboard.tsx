@@ -158,7 +158,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
           <select 
             value={selectedSemester}
             onChange={(e) => setSelectedSemester(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-            className="text-sm p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            className="text-sm p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
           >
             <option value="all">Tất cả</option>
             {Array.from({ length: semestersPerYear }, (_, i) => (
@@ -170,7 +170,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-indigo-500 dark:bg-indigo-600 text-white p-3 sm:p-4 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
+        <div className="bg-primary dark:bg-primary text-primary-foreground p-3 sm:p-4 rounded-2xl shadow-lg shadow-primary/20 dark:shadow-none">
             <div className="flex items-center gap-2 opacity-80 mb-1">
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="text-xs font-medium uppercase">Trung bình</span>
@@ -205,7 +205,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ scores, isDarkMode, roundi
                 <div key={subject.name} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                     <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
                         <h4 className="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">{subject.name}</h4>
-                        <div className="text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        <div className="text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full bg-primary/10 text-primary dark:bg-primary/30 dark:text-primary-foreground border border-primary/20 dark:border-primary/80">
                             {subject.average.toFixed(rounding)}
                             <span className="text-xs opacity-70 ml-0.5">/{defaultMaxScore}</span>
                         </div>

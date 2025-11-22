@@ -559,7 +559,7 @@ function App() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-indigo-200 dark:border-indigo-800 border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/20 dark:border-primary/80 border-t-primary dark:border-t-primary/40 rounded-full animate-spin" />
       </div>
     );
   }
@@ -640,8 +640,8 @@ function App() {
             {/* Welcome / Empty State */}
             {scores.length === 0 && !isLoading && (
               <div className="text-center py-12 space-y-4 print:hidden">
-                <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                <div className="w-16 h-16 bg-primary/5 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-8 h-8 text-primary dark:text-primary/80" />
                 </div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Theo dõi điểm của bạn</h2>
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
@@ -649,37 +649,6 @@ function App() {
                   <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-2 block">"Tôi được 10 điểm Toán cuối học kỳ"</span>
                   <span className="italic text-slate-400 dark:text-slate-500 text-sm mt-1 block">"Được Vật lý 10 và Toán 8 trong giữa học kỳ"</span>
                 </p>
-              </div>
-            )}
-
-            {/* Search Bar - Now above the two-column layout */}
-            {scores.length > 0 && (
-              <div className="mb-6 print:hidden">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
-                    className="pl-10 pr-10"
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                {searchQuery && (
-                  <p className="text-xs text-muted-foreground mt-2 px-1">
-                    Tìm thấy {filteredScores.length} kết quả
-                  </p>
-                )}
               </div>
             )}
 
@@ -692,7 +661,7 @@ function App() {
                       {index > 0 && <span className="text-slate-300 dark:text-slate-700">•</span>}
                       <a 
                         href={`#${link.id}`}
-                        className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                        className="text-sm font-medium text-primary dark:text-primary/80 hover:text-primary/80 dark:hover:text-primary/60 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/5 dark:hover:bg-primary/20"
                         onClick={(e) => {
                           e.preventDefault();
                           document.getElementById(link.id)?.scrollIntoView({ 
@@ -728,6 +697,37 @@ function App() {
 
               {/* Right Column: History (Score List) */}
               <div id="history" className="scroll-mt-20">
+                
+                {/* Search Bar - On top of history column, mobile and desktop */}
+                {scores.length > 0 && (
+                  <div className="mb-4 print:hidden">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Tìm kiếm môn học, loại bài kiểm tra..."
+                        className="pl-10 pr-10"
+                      />
+                      {searchQuery && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    {searchQuery && (
+                      <p className="text-xs text-muted-foreground mt-2 px-1">
+                        Tìm thấy {filteredScores.length} kết quả
+                      </p>
+                    )}
+                  </div>
+                )}
                 
                 {/* Recent List Header */}
                 {scores.length > 0 && (
@@ -768,7 +768,7 @@ function App() {
                 {/* Score List */}
                 <div className="space-y-3 mb-24 lg:mb-32 print:mb-0">
                   {isLoading && (
-                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-indigo-100 dark:border-indigo-900/30 animate-pulse flex gap-4">
+                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-primary/10 dark:border-primary/30 animate-pulse flex gap-4">
                         <div className="flex-1 space-y-3">
                             <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
                             <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
