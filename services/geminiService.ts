@@ -3,6 +3,48 @@ import { ScoreEntry } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+// Validate if input text looks like it might contain score information
+const validateScoreInput = (text: string): { isValid: boolean; error?: string } => {
+  const trimmedText = text.trim();
+  
+  // Check if input is too short
+  if (trimmedText.length < 3) {
+    return {
+      isValid: false,
+      error: "Văn bản quá ngắn. Vui lòng nhập thông tin điểm số đầy đủ hơn."
+    };
+  }
+  
+  // Check if input contains at least one number (potential score)
+  const hasNumber = /\d/.test(trimmedText);
+  if (!hasNumber) {
+    return {
+      isValid: false,
+      error: "Không tìm thấy điểm số trong văn bản. Vui lòng nhập điểm số (ví dụ: 'Toán 9 điểm' hoặc 'Got 8.5 in Physics')."
+    };
+  }
+  
+  // Check if input is just a number or very simple text without context
+  const isJustNumber = /^\d+\.?\d*$/.test(trimmedText);
+  if (isJustNumber) {
+    return {
+      isValid: false,
+      error: "Vui lòng nhập đầy đủ thông tin môn học và điểm số (ví dụ: 'Toán 9 điểm' thay vì chỉ '9')."
+    };
+  }
+  
+  // Check for common non-score phrases
+  const commonNonScorePhrases = /^(hello|hi|hey|test|xin chào|chào)/i;
+  if (commonNonScorePhrases.test(trimmedText)) {
+    return {
+      isValid: false,
+      error: "Vui lòng nhập thông tin điểm số. Ví dụ: 'Toán 9 điểm cuối học kỳ' hoặc 'Got Physics 8.5 in midterm'."
+    };
+  }
+  
+  return { isValid: true };
+};
+
 // Helper function to build subject instruction for AI
 const buildSubjectInstruction = (customSubjects: string[]): string => {
   if (customSubjects.length === 0) {
@@ -34,6 +76,12 @@ export const parseScoreFromText = async (
   customSubjects: string[] = []
 ): Promise<Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'> | null> => {
   try {
+    // Validate input before calling AI
+    const validation = validateScoreInput(text);
+    if (!validation.isValid) {
+      throw new Error(validation.error);
+    }
+    
     // Ensure we have at least 'Other' if the list is somehow empty
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
 
@@ -96,6 +144,12 @@ export const parseBulkScoresFromText = async (
   customSubjects: string[] = []
 ): Promise<Omit<ScoreEntry, 'id' | 'timestamp' | 'originalText'>[]> => {
   try {
+    // Validate input before calling AI
+    const validation = validateScoreInput(text);
+    if (!validation.isValid) {
+      throw new Error(validation.error);
+    }
+    
     // Ensure we have at least 'Other' if the list is somehow empty
     const examTypes = availableExamTypes.length > 0 ? availableExamTypes : ['Other'];
 
