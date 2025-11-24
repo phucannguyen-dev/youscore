@@ -326,7 +326,10 @@ function App() {
         }
       }
     } catch (err) {
-      setError("Đã có lỗi xảy ra. Vui lòng kiểm tra kết nối của bạn.");
+      // Display the error message from validation or AI service
+      const errorMessage = err instanceof Error ? err.message : "Đã có lỗi xảy ra. Vui lòng kiểm tra kết nối của bạn.";
+      setError(errorMessage);
+      console.error("Error submitting score:", err);
     } finally {
       setIsLoading(false);
     }
