@@ -3,12 +3,19 @@ import { ScoreEntry } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
+// Constants for input validation
+const MIN_INPUT_LENGTH = 3;
+const NON_SCORE_PHRASES = [
+  'hello', 'hi', 'hey', 'test', 
+  'xin chào', 'chào', 'chao'
+];
+
 // Validate if input text looks like it might contain score information
 const validateScoreInput = (text: string): { isValid: boolean; error?: string } => {
   const trimmedText = text.trim();
   
   // Check if input is too short
-  if (trimmedText.length < 3) {
+  if (trimmedText.length < MIN_INPUT_LENGTH) {
     return {
       isValid: false,
       error: "Văn bản quá ngắn. Vui lòng nhập thông tin điểm số đầy đủ hơn."
@@ -25,7 +32,7 @@ const validateScoreInput = (text: string): { isValid: boolean; error?: string } 
   }
   
   // Check if input is just a number or very simple text without context
-  const isJustNumber = /^\d+\.?\d*$/.test(trimmedText);
+  const isJustNumber = /^\d+(\.\d+)?$/.test(trimmedText);
   if (isJustNumber) {
     return {
       isValid: false,
@@ -34,8 +41,11 @@ const validateScoreInput = (text: string): { isValid: boolean; error?: string } 
   }
   
   // Check for common non-score phrases
-  const commonNonScorePhrases = /^(hello|hi|hey|test|xin chào|chào)/i;
-  if (commonNonScorePhrases.test(trimmedText)) {
+  const lowerText = trimmedText.toLowerCase();
+  const startsWithNonScorePhrase = NON_SCORE_PHRASES.some(phrase => 
+    lowerText.startsWith(phrase)
+  );
+  if (startsWithNonScorePhrase) {
     return {
       isValid: false,
       error: "Vui lòng nhập thông tin điểm số. Ví dụ: 'Toán 9 điểm cuối học kỳ' hoặc 'Got Physics 8.5 in midterm'."
